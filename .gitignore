@@ -1,0 +1,15 @@
+# Daily work logs — local only, never pushed
+work-*.md
+session-*.md
+
+# Generation artifacts
+gen-cache.jsonl
+*.output
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Editor
+.vscode/
+*.swp
