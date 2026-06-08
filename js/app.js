@@ -1,204 +1,202 @@
-// === Celia — app.js ===
+// Celia internal chat workbench.
 
-const LS_ENDPOINT = 'celia_endpoint';
-const LS_THEME = 'celia_theme';
-const LS_SYSTEM = 'celia_system_prompt';
-const LS_CHAT = 'celia_chat';
+const LS_ENDPOINT = "celia_endpoint";
+const LS_SYSTEM = "celia_system_prompt";
+const LS_CHAT = "celia_chat";
+const LS_TAB = "celia_active_tab";
 
-const DEFAULT_ENDPOINT = 'http://spark-0af9:8080';
-
-// ── State ────────────────────────────────────────────────────────────────────
+const DEFAULT_ENDPOINT = "http://spark-0af9:8080";
+const DEFAULT_TEMPERATURE = 0.2;
+const DEFAULT_MAX_TOKENS = 1024;
 
 let endpoint = localStorage.getItem(LS_ENDPOINT) || DEFAULT_ENDPOINT;
-let systemPrompt = localStorage.getItem(LS_SYSTEM) || '';
-let messages = []; // {role, content}
+let systemPrompt = localStorage.getItem(LS_SYSTEM) || "";
+let messages = [];
 let streaming = false;
 let abortCtrl = null;
 
-// ── DOM ──────────────────────────────────────────────────────────────────────
+const $chatArea = document.getElementById("chatArea");
+const $chatEmpty = document.getElementById("chatEmpty");
+const $composer = document.getElementById("composer");
+const $msgInput = document.getElementById("msgInput");
+const $sendBtn = document.getElementById("sendBtn");
+const $modelSelect = document.getElementById("modelSelect");
+const $connectionPill = document.getElementById("connectionPill");
+const $connectionLabel = document.getElementById("connectionLabel");
+const $headerSub = document.getElementById("headerSub");
+const $typingInd = document.getElementById("typingIndicator");
+const $typingLabel = document.getElementById("typingLabel");
+const $modelHint = document.getElementById("modelHint");
+const $settingsBtn = document.getElementById("settingsBtn");
+const $settingsModal = document.getElementById("settingsModal");
+const $settingsClose = document.getElementById("settingsClose");
+const $settingsCancel = document.getElementById("settingsCancel");
+const $settingsSave = document.getElementById("settingsSave");
+const $endpointInput = document.getElementById("endpointInput");
+const $systemInput = document.getElementById("systemPromptInput");
+const $clearBtn = document.getElementById("clearBtn");
+const $exportBtn = document.getElementById("exportBtn");
+const promptButtons = Array.from(document.querySelectorAll("[data-prompt]"));
+const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
+const tabPanels = Array.from(document.querySelectorAll("[data-tab-panel]"));
 
-const $chatArea     = document.getElementById('chatArea');
-const $chatEmpty    = document.getElementById('chatEmpty');
-const $msgInput     = document.getElementById('msgInput');
-const $sendBtn      = document.getElementById('sendBtn');
-const $modelSelect  = document.getElementById('modelSelect');
-const $statusDot    = document.getElementById('statusDot');
-const $headerSub    = document.getElementById('headerSub');
-const $typingInd    = document.getElementById('typingIndicator');
-const $typingLabel  = document.getElementById('typingLabel');
-
-// Guide
-const $guideToggle  = document.getElementById('guideToggle');
-const $guideBody    = document.getElementById('guideBody');
-const $guideChevron = document.getElementById('guideChevron');
-const $guideModels  = document.getElementById('guideModelList');
-
-// Settings
-const $settingsBtn    = document.getElementById('settingsBtn');
-const $settingsModal  = document.getElementById('settingsModal');
-const $settingsCancel = document.getElementById('settingsCancel');
-const $settingsSave   = document.getElementById('settingsSave');
-const $endpointInput  = document.getElementById('endpointInput');
-const $systemInput    = document.getElementById('systemPromptInput');
-const $themeSelect    = document.getElementById('themeSelect');
-const $clearBtn       = document.getElementById('clearBtn');
-
-// ── Theme ────────────────────────────────────────────────────────────────────
-
-function applyTheme(t) {
-  const resolved = t === 'system'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : t;
-  document.documentElement.dataset.theme = resolved;
-  localStorage.setItem(LS_THEME, t);
+function activateTab(tabName) {
+  const selected = tabPanels.some((panel) => panel.dataset.tabPanel === tabName) ? tabName : "chat";
+  tabButtons.forEach((button) => {
+    const isActive = button.dataset.tabTarget === selected;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-selected", String(isActive));
+  });
+  tabPanels.forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.tabPanel === selected);
+  });
+  localStorage.setItem(LS_TAB, selected);
 }
-$themeSelect.value = localStorage.getItem(LS_THEME) || 'system';
 
-// ── Guide Toggle ─────────────────────────────────────────────────────────────
-
-$guideToggle.addEventListener('click', () => {
-  $guideBody.classList.toggle('open');
-  $guideChevron.classList.toggle('open');
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => activateTab(button.dataset.tabTarget || "chat"));
 });
 
-// ── Settings Modal ───────────────────────────────────────────────────────────
+function setConnection(state, label, detail) {
+  $connectionPill.className = `status-pill ${state}`;
+  $connectionLabel.textContent = label;
+  $headerSub.textContent = detail;
+}
 
-$settingsBtn.addEventListener('click', () => {
+function openSettings() {
   $endpointInput.value = endpoint;
   $systemInput.value = systemPrompt;
-  $themeSelect.value = localStorage.getItem(LS_THEME) || 'system';
-  $settingsModal.classList.add('open');
+  $settingsModal.classList.add("open");
+  $settingsModal.setAttribute("aria-hidden", "false");
+}
+
+function closeSettings() {
+  $settingsModal.classList.remove("open");
+  $settingsModal.setAttribute("aria-hidden", "true");
+}
+
+$settingsBtn.addEventListener("click", openSettings);
+$settingsClose.addEventListener("click", closeSettings);
+$settingsCancel.addEventListener("click", closeSettings);
+$settingsModal.addEventListener("click", (event) => {
+  if (event.target === $settingsModal) closeSettings();
 });
-$settingsCancel.addEventListener('click', () => $settingsModal.classList.remove('open'));
-$settingsModal.addEventListener('click', (e) => {
-  if (e.target === $settingsModal) $settingsModal.classList.remove('open');
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && $settingsModal.classList.contains("open")) closeSettings();
 });
-$settingsSave.addEventListener('click', () => {
-  endpoint = $endpointInput.value.replace(/\/+$/, '') || DEFAULT_ENDPOINT;
+
+$settingsSave.addEventListener("click", () => {
+  endpoint = $endpointInput.value.replace(/\/+$/, "") || DEFAULT_ENDPOINT;
   systemPrompt = $systemInput.value.trim();
   localStorage.setItem(LS_ENDPOINT, endpoint);
   localStorage.setItem(LS_SYSTEM, systemPrompt);
-  applyTheme($themeSelect.value);
-  $settingsModal.classList.remove('open');
+  closeSettings();
   loadModels();
 });
 
-// ── Clear Chat ───────────────────────────────────────────────────────────────
-
-$clearBtn.addEventListener('click', () => {
+$clearBtn.addEventListener("click", () => {
   if (streaming) return;
   messages = [];
   localStorage.removeItem(LS_CHAT);
   renderChat();
 });
 
-// ── Model Loading ────────────────────────────────────────────────────────────
+$exportBtn.addEventListener("click", async () => {
+  const transcript = messages
+    .map((message) => `${message.role === "user" ? "Joshua" : "Celia"}:\n${message.content}`)
+    .join("\n\n");
+  try {
+    await navigator.clipboard.writeText(transcript || "No transcript yet.");
+    $exportBtn.textContent = "Copied";
+    setTimeout(() => { $exportBtn.textContent = "Copy transcript"; }, 1400);
+  } catch {
+    $exportBtn.textContent = "Copy failed";
+    setTimeout(() => { $exportBtn.textContent = "Copy transcript"; }, 1400);
+  }
+});
+
+promptButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    $msgInput.value = button.dataset.prompt || "";
+    resizeComposer();
+    $msgInput.focus();
+  });
+});
 
 async function loadModels() {
-  $statusDot.className = 'status-dot loading';
+  setConnection("loading", "Checking", "Connecting to the configured inference endpoint.");
   $modelSelect.innerHTML = '<option value="">Connecting...</option>';
-  $headerSub.textContent = 'Connecting...';
+  $modelHint.textContent = endpoint;
 
   try {
-    const resp = await fetch(`${endpoint}/v1/models`, { signal: AbortSignal.timeout(10000) });
-    const data = await resp.json();
+    const response = await fetch(`${endpoint}/v1/models`, { signal: AbortSignal.timeout(10000) });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
     const models = data.data || [];
 
     if (models.length === 0) {
       $modelSelect.innerHTML = '<option value="">No models found</option>';
-      $statusDot.className = 'status-dot disconnected';
-      $headerSub.textContent = 'No models available';
-      updateGuideModels([]);
+      setConnection("disconnected", "No model", "Endpoint responded, but no models were listed.");
       return;
     }
 
-    // Sort: loaded first, then alphabetical
     models.sort((a, b) => {
-      const al = a.status?.value === 'loaded' ? 0 : 1;
-      const bl = b.status?.value === 'loaded' ? 0 : 1;
+      const al = a.status?.value === "loaded" ? 0 : 1;
+      const bl = b.status?.value === "loaded" ? 0 : 1;
       if (al !== bl) return al - bl;
       return a.id.localeCompare(b.id);
     });
 
-    $modelSelect.innerHTML = models.map(m => {
-      const loaded = m.status?.value === 'loaded' ? ' [loaded]' : '';
-      return `<option value="${m.id}">${m.id}${loaded}</option>`;
-    }).join('');
+    $modelSelect.innerHTML = models.map((model) => {
+      const loaded = model.status?.value === "loaded" ? " [loaded]" : "";
+      return `<option value="${escapeAttr(model.id)}">${escapeHtml(model.id)}${loaded}</option>`;
+    }).join("");
 
-    // Default to first loaded model
-    const loaded = models.find(m => m.status?.value === 'loaded');
+    const loaded = models.find((model) => model.status?.value === "loaded");
     if (loaded) $modelSelect.value = loaded.id;
 
-    $statusDot.className = 'status-dot connected';
-    $headerSub.textContent = `${models.length} models available`;
-    updateGuideModels(models);
-
-  } catch (e) {
+    setConnection("connected", "Online", `${models.length} model${models.length === 1 ? "" : "s"} available for internal testing.`);
+    $modelHint.textContent = loaded ? `Loaded: ${loaded.id}` : "Model required";
+  } catch (error) {
     $modelSelect.innerHTML = '<option value="">Connection failed</option>';
-    $statusDot.className = 'status-dot disconnected';
-    $headerSub.textContent = 'Unable to reach server';
-    updateGuideModels([]);
+    setConnection("disconnected", "Offline", "Unable to reach the configured inference endpoint.");
+    $modelHint.textContent = error.message || "Connection failed.";
   }
 }
-
-function updateGuideModels(models) {
-  if (models.length === 0) {
-    $guideModels.innerHTML = `<div class="guide-model-row"><span class="guide-model-name">No models</span><span class="guide-model-desc">Check endpoint in Settings</span></div>`;
-    return;
-  }
-  $guideModels.innerHTML = models.map(m => {
-    const isLoaded = m.status?.value === 'loaded';
-    return `<div class="guide-model-row${isLoaded ? ' guide-model-best' : ''}">
-      <span class="guide-model-name">${m.id}${isLoaded ? ' &#9889;' : ''}</span>
-      <span class="guide-model-desc">${isLoaded ? 'loaded' : 'available'}</span>
-    </div>`;
-  }).join('');
-}
-
-// ── Chat Rendering ───────────────────────────────────────────────────────────
 
 function renderChat() {
-  // Remove empty state if messages exist
-  if (messages.length > 0 && $chatEmpty) {
-    $chatEmpty.style.display = 'none';
-  } else if ($chatEmpty) {
-    $chatEmpty.style.display = '';
-  }
+  if ($chatEmpty) $chatEmpty.style.display = messages.length > 0 ? "none" : "";
+  $chatArea.querySelectorAll(".message").forEach((element) => element.remove());
 
-  // Clear and re-render all messages
-  const existing = $chatArea.querySelectorAll('.message');
-  existing.forEach(el => el.remove());
+  messages.forEach((message) => {
+    const row = document.createElement("div");
+    row.className = `message ${message.role === "user" ? "user" : "assistant"}`;
 
-  messages.forEach(msg => {
-    const div = document.createElement('div');
-    div.className = `message ${msg.role === 'user' ? 'user' : 'assistant'}`;
+    const avatar = message.role === "user"
+      ? '<div class="msg-avatar-letter">J</div>'
+      : '<div class="msg-avatar-letter celia-avatar">C</div>';
 
-    const letter = msg.role === 'user' ? 'U' : 'C';
-    div.innerHTML = `
-      <div class="msg-avatar-letter">${letter}</div>
+    row.innerHTML = `
+      ${avatar}
       <div class="msg-content">
-        <div class="msg-name">${msg.role === 'user' ? 'You' : $modelSelect.value || 'Model'}</div>
-        <div class="msg-bubble">${escapeHtml(msg.content)}</div>
+        <div class="msg-name">${message.role === "user" ? "Joshua" : "Celia"}</div>
+        <div class="msg-bubble">${escapeHtml(message.content)}</div>
       </div>
     `;
-    $chatArea.insertBefore(div, $typingInd);
+    $chatArea.insertBefore(row, $typingInd);
   });
 
   $chatArea.scrollTop = $chatArea.scrollHeight;
 }
 
 function appendAssistantToken(token) {
-  // Find last assistant message bubble
-  const msgs = $chatArea.querySelectorAll('.message.assistant');
-  if (msgs.length === 0) return;
-  const last = msgs[msgs.length - 1];
-  const bubble = last.querySelector('.msg-bubble');
+  const assistantMessages = $chatArea.querySelectorAll(".message.assistant");
+  if (assistantMessages.length === 0) return;
+  const last = assistantMessages[assistantMessages.length - 1];
+  const bubble = last.querySelector(".msg-bubble");
   if (bubble) bubble.textContent += token;
   $chatArea.scrollTop = $chatArea.scrollHeight;
-}
-
-function escapeHtml(str) {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function saveChat() {
@@ -209,77 +207,80 @@ function loadChat() {
   try {
     const raw = localStorage.getItem(LS_CHAT);
     if (raw) messages = JSON.parse(raw);
-  } catch(e) {}
+  } catch {
+    messages = [];
+  }
   renderChat();
 }
 
-// ── Sending Messages ─────────────────────────────────────────────────────────
-
 async function sendMessage() {
   const text = $msgInput.value.trim();
-  if (!text || streaming) return;
+  if (!text) return;
+
+  if (streaming) {
+    abortCtrl?.abort();
+    return;
+  }
 
   const model = $modelSelect.value;
-  if (!model) return;
+  if (!model) {
+    openSettings();
+    return;
+  }
 
-  // Add user message
-  messages.push({ role: 'user', content: text });
-  $msgInput.value = '';
-  $msgInput.style.height = 'auto';
-
-  // Add empty assistant message
-  messages.push({ role: 'assistant', content: '' });
+  messages.push({ role: "user", content: text });
+  $msgInput.value = "";
+  resizeComposer();
+  messages.push({ role: "assistant", content: "" });
   renderChat();
 
-  // Show typing
   streaming = true;
-  $sendBtn.disabled = true;
-  $typingInd.classList.add('visible');
-  $typingLabel.textContent = `${model} generating...`;
+  abortCtrl = new AbortController();
+  $sendBtn.textContent = "Stop";
+  $sendBtn.classList.add("is-stopping");
+  $typingInd.classList.add("visible");
+  $typingLabel.textContent = "Generating";
 
-  // Build messages payload
   const apiMessages = [];
-  if (systemPrompt) apiMessages.push({ role: 'system', content: systemPrompt });
-  messages.slice(0, -1).forEach(m => { // exclude the empty assistant msg
-    if (m.role === 'user' || (m.role === 'assistant' && m.content)) {
-      apiMessages.push({ role: m.role, content: m.content });
+  if (systemPrompt) apiMessages.push({ role: "system", content: systemPrompt });
+  messages.slice(0, -1).forEach((message) => {
+    if (message.role === "user" || (message.role === "assistant" && message.content)) {
+      apiMessages.push({ role: message.role, content: message.content });
     }
   });
 
-  abortCtrl = new AbortController();
-
   try {
-    const resp = await fetch(`${endpoint}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch(`${endpoint}/v1/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: model,
+        model,
         messages: apiMessages,
         stream: true,
-        temperature: 0.85,
-        max_tokens: 1024,
+        temperature: DEFAULT_TEMPERATURE,
+        max_tokens: DEFAULT_MAX_TOKENS,
       }),
       signal: abortCtrl.signal,
     });
 
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.body) throw new Error("No response stream");
 
-    const reader = resp.body.getReader();
+    const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = '';
+    let buffer = "";
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-
       buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
 
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue;
+      lines.forEach((line) => {
+        if (!line.startsWith("data: ")) return;
         const data = line.slice(6).trim();
-        if (data === '[DONE]') continue;
+        if (data === "[DONE]") return;
 
         try {
           const parsed = JSON.parse(data);
@@ -288,45 +289,63 @@ async function sendMessage() {
             messages[messages.length - 1].content += token;
             appendAssistantToken(token);
           }
-        } catch(e) {}
-      }
+        } catch {
+          // Ignore partial server-sent event frames.
+        }
+      });
     }
 
-    // Strip any <think> blocks from the final content
     const last = messages[messages.length - 1];
-    last.content = last.content.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
-
-  } catch (e) {
-    if (e.name !== 'AbortError') {
-      messages[messages.length - 1].content = `[Error: ${e.message}]`;
+    last.content = stripThinking(last.content);
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      messages[messages.length - 1].content = `[Error: ${error.message}]`;
     }
   } finally {
     streaming = false;
     abortCtrl = null;
-    $sendBtn.disabled = false;
-    $typingInd.classList.remove('visible');
+    $sendBtn.textContent = "Send";
+    $sendBtn.classList.remove("is-stopping");
+    $typingInd.classList.remove("visible");
     saveChat();
     renderChat();
   }
 }
 
-// ── Input Handling ───────────────────────────────────────────────────────────
+function stripThinking(value) {
+  return value.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+}
 
-$sendBtn.addEventListener('click', sendMessage);
-$msgInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/"/g, "&quot;");
+}
+
+function resizeComposer() {
+  $msgInput.style.height = "auto";
+  $msgInput.style.height = `${Math.min($msgInput.scrollHeight, 150)}px`;
+}
+
+$composer.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendMessage();
+});
+
+$msgInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
     sendMessage();
   }
 });
 
-// Auto-resize textarea
-$msgInput.addEventListener('input', () => {
-  $msgInput.style.height = 'auto';
-  $msgInput.style.height = Math.min($msgInput.scrollHeight, 120) + 'px';
-});
-
-// ── Init ─────────────────────────────────────────────────────────────────────
+$msgInput.addEventListener("input", resizeComposer);
 
 loadChat();
 loadModels();
+activateTab(localStorage.getItem(LS_TAB) || "chat");
