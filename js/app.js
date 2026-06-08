@@ -36,6 +36,8 @@ const $endpointInput = document.getElementById("endpointInput");
 const $systemInput = document.getElementById("systemPromptInput");
 const $clearBtn = document.getElementById("clearBtn");
 const $exportBtn = document.getElementById("exportBtn");
+const $runsContent = document.getElementById("runsContent");
+const $benchmarksContent = document.getElementById("benchmarksContent");
 const promptButtons = Array.from(document.querySelectorAll("[data-prompt]"));
 const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
 const tabPanels = Array.from(document.querySelectorAll("[data-tab-panel]"));
@@ -188,6 +190,185 @@ function renderChat() {
   });
 
   $chatArea.scrollTop = $chatArea.scrollHeight;
+}
+
+async function loadProjectState() {
+  let state = window.CELIA_PROJECT_STATE || null;
+
+  if (window.location.protocol !== "file:") {
+    try {
+      const response = await fetch("data/project-state.json", { cache: "no-store" });
+      if (response.ok) state = await response.json();
+    } catch {
+      // file:// previews use data/project-state.js as a browser-safe mirror.
+    }
+  }
+
+  if (!state) {
+    renderStateError($runsContent, "Runs unavailable");
+    renderStateError($benchmarksContent, "Benchmarks unavailable");
+    return;
+  }
+
+  renderRuns(state);
+  renderBenchmarks(state);
+}
+
+function renderRuns(state) {
+  const runs = state.runs || {};
+  const headline = runs.headline || {};
+  $runsContent.innerHTML = `
+    ${renderHero(headline, state)}
+    ${renderCardGrid(runs.cards || [])}
+    ${renderMetricStrip(runs.metrics || [])}
+    <div class="state-split">
+      ${renderTimeline(runs.timeline || [])}
+      ${renderPaths(runs.paths || [], "Run paths")}
+    </div>
+  `;
+}
+
+function renderBenchmarks(state) {
+  const benchmarks = state.benchmarks || {};
+  const headline = benchmarks.headline || {};
+  $benchmarksContent.innerHTML = `
+    ${renderHero(headline, state)}
+    ${renderCardGrid(benchmarks.cards || [])}
+    ${renderMetricStrip(benchmarks.metrics || [])}
+    ${renderBenchmarkRows(benchmarks.rows || [])}
+    ${renderPaths(benchmarks.paths || [], "Benchmark paths")}
+  `;
+}
+
+function renderHero(headline, state) {
+  return `
+    <article class="state-hero">
+      <div>
+        <span class="eyebrow">${escapeHtml(headline.label || "Status")}</span>
+        <h2>${escapeHtml(headline.title || "No title")}</h2>
+      </div>
+      <div class="state-hero-side">
+        <span class="status-chip ${escapeAttr(headline.tone || "gold")}">${escapeHtml(headline.status || "Unknown")}</span>
+        <span class="state-updated">${escapeHtml(headline.updated || formatDate(state.updatedAt))}</span>
+      </div>
+      <p>${escapeHtml(headline.detail || "")}</p>
+    </article>
+  `;
+}
+
+function renderCardGrid(cards) {
+  if (!cards.length) return "";
+  return `
+    <div class="board-grid">
+      ${cards.map((card) => `
+        <article class="board-card state-card">
+          <span class="eyebrow">${escapeHtml(card.label)}</span>
+          <strong>${escapeHtml(card.value)}</strong>
+          <p>${escapeHtml(card.detail || "")}</p>
+          ${card.meta ? `<span class="state-meta">${escapeHtml(card.meta)}</span>` : ""}
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderMetricStrip(metrics) {
+  if (!metrics.length) return "";
+  return `
+    <div class="metric-strip">
+      ${metrics.map((metric) => `
+        <article class="metric-card">
+          <span>${escapeHtml(metric.label)}</span>
+          <strong>${escapeHtml(metric.value)}</strong>
+          <small>${escapeHtml(metric.detail || "")}</small>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderTimeline(items) {
+  if (!items.length) return "";
+  return `
+    <article class="board-card state-list-card">
+      <span class="eyebrow">Run sequence</span>
+      <ol class="state-timeline">
+        ${items.map((item) => `
+          <li>
+            <span class="timeline-dot"></span>
+            <div>
+              <strong>${escapeHtml(item.name)}</strong>
+              <em>${escapeHtml(item.status)}</em>
+              <p>${escapeHtml(item.detail || "")}</p>
+            </div>
+          </li>
+        `).join("")}
+      </ol>
+    </article>
+  `;
+}
+
+function renderBenchmarkRows(rows) {
+  if (!rows.length) return "";
+  return `
+    <article class="board-card board-card--wide state-list-card">
+      <span class="eyebrow">Benchmark ledger</span>
+      <table class="data-table state-table">
+        <thead>
+          <tr><th>Model</th><th>Benchmark</th><th>Status</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map((row) => `
+            <tr>
+              <th>${escapeHtml(row.name)}</th>
+              <td>${escapeHtml(row.benchmark)}</td>
+              <td>${escapeHtml(row.status)}</td>
+              <td>${escapeHtml(row.result)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </article>
+  `;
+}
+
+function renderPaths(paths, title) {
+  if (!paths.length) return "";
+  return `
+    <article class="board-card state-list-card">
+      <span class="eyebrow">${escapeHtml(title)}</span>
+      <dl class="path-list">
+        ${paths.map((path) => `
+          <div>
+            <dt>${escapeHtml(path.label)}</dt>
+            <dd>${escapeHtml(path.value)}</dd>
+          </div>
+        `).join("")}
+      </dl>
+    </article>
+  `;
+}
+
+function renderStateError(target, label) {
+  if (!target) return;
+  target.innerHTML = `
+    <article class="state-hero">
+      <span class="eyebrow">${escapeHtml(label)}</span>
+      <h2>State file missing</h2>
+    </article>
+  `;
+}
+
+function formatDate(value) {
+  if (!value) return "";
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
 }
 
 function appendAssistantToken(token) {
@@ -347,5 +528,6 @@ $msgInput.addEventListener("keydown", (event) => {
 $msgInput.addEventListener("input", resizeComposer);
 
 loadChat();
+loadProjectState();
 loadModels();
 activateTab(localStorage.getItem(LS_TAB) || "chat");

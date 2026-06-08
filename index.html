@@ -89,32 +89,7 @@
         </section>
 
         <section class="tab-panel" data-tab-panel="runs">
-          <div class="board-grid">
-            <article class="board-card">
-              <span class="eyebrow">Active</span>
-              <dl class="info-list">
-                <div><dt>CA9</dt><dd>Chunk 001</dd></div>
-                <div><dt>Stage</dt><dd>Judging</dd></div>
-                <div><dt>SFT9</dt><dd>Paused</dd></div>
-              </dl>
-            </article>
-            <article class="board-card">
-              <span class="eyebrow">Training</span>
-              <dl class="info-list">
-                <div><dt>Base</dt><dd>Celia A0.2.1</dd></div>
-                <div><dt>Adapter</dt><dd>LoRA SFT</dd></div>
-                <div><dt>Launch</dt><dd>Manual approval</dd></div>
-              </dl>
-            </article>
-            <article class="board-card">
-              <span class="eyebrow">Spark</span>
-              <dl class="info-list">
-                <div><dt>Host</dt><dd>spark-0af9</dd></div>
-                <div><dt>Judge batch</dt><dd>2</dd></div>
-                <div><dt>Queue</dt><dd>CA / SFT / Eval</dd></div>
-              </dl>
-            </article>
-          </div>
+          <div class="state-panel" id="runsContent" aria-live="polite"></div>
         </section>
 
         <section class="tab-panel" data-tab-panel="data">
@@ -162,24 +137,7 @@
         </section>
 
         <section class="tab-panel" data-tab-panel="benchmarks">
-          <div class="board-grid">
-            <article class="board-card">
-              <span class="eyebrow">Celia</span>
-              <dl class="info-list">
-                <div><dt>Theology</dt><dd>V1.0</dd></div>
-                <div><dt>FMG</dt><dd>fideAI</dd></div>
-                <div><dt>Scoring</dt><dd>0 / 0.5 / 1</dd></div>
-              </dl>
-            </article>
-            <article class="board-card">
-              <span class="eyebrow">Judge</span>
-              <dl class="info-list">
-                <div><dt>Dev</dt><dd>V1.2</dd></div>
-                <div><dt>Holdout</dt><dd>V1.2</dd></div>
-                <div><dt>Target</dt><dd>Accuracy first</dd></div>
-              </dl>
-            </article>
-          </div>
+          <div class="state-panel" id="benchmarksContent" aria-live="polite"></div>
         </section>
 
         <section class="tab-panel" data-tab-panel="planning">
@@ -246,6 +204,7 @@
     </div>
   </div>
 
+<script src="data/project-state.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
