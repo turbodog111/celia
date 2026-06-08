@@ -1,26 +1,26 @@
 {
-  "updatedAt": "2026-06-08T14:50:34Z",
+  "updatedAt": "2026-06-08T15:18:02Z",
   "source": "celia/planning/progress.md plus local run artifacts",
   "runs": {
     "headline": {
       "label": "Active decision",
-      "title": "CA9 chunk 001",
-      "status": "Judging first batch",
+      "title": "CA9 chunk 001 complete",
+      "status": "Stopped for approval",
       "tone": "gold",
-      "detail": "SFT9 paused for manual approval",
-      "updated": "2026-06-08 08:18 EDT"
+      "detail": "996 KEEP, 4 REJECT, 0 unparsed",
+      "updated": "2026-06-08 11:18 EDT"
     },
     "cards": [
       {
         "label": "Current run",
-        "value": "CA9 chunk 001",
-        "detail": "1,000 lint-passed candidates from 1,569 raw rows",
-        "meta": "Last file-backed status: 580 / 1,000 judged"
+        "value": "CA9 chunk 001 complete",
+        "detail": "1,000 judged candidates from 1,569 raw rows",
+        "meta": "996 KEEP / 4 REJECT / 0 unparsed"
       },
       {
         "label": "Next decision",
         "value": "SFT9 manual approval",
-        "detail": "Inspect accepted KEEP count after the watcher stops CA9",
+        "detail": "Decide whether to materialize CeliaA0.2.1-SFT9-v1",
         "meta": "No SFT9 auto-launch"
       },
       {
@@ -32,19 +32,19 @@
     ],
     "metrics": [
       {
-        "label": "SFT8B train rows",
-        "value": "5,876",
-        "detail": "3,898 CA / 1,978 AG-MI"
+        "label": "CA9 accepted",
+        "value": "996",
+        "detail": "99.6% KEEP rate"
       },
       {
-        "label": "SFT8B best eval loss",
-        "value": "1.2799",
-        "detail": "lr7e-5 plateau-p0"
+        "label": "CA9 rejected",
+        "value": "4",
+        "detail": "0 unparsed"
       },
       {
-        "label": "SFT8B runtime",
-        "value": "49.9m",
-        "detail": "early-stopped at step 1,800"
+        "label": "CA9 judge runtime",
+        "value": "7.49h",
+        "detail": "1,000 examples"
       }
     ],
     "timeline": [
@@ -65,8 +65,8 @@
       },
       {
         "name": "CA9 chunk 001",
-        "status": "Judging",
-        "detail": "First judged batch only; SFT9 paused"
+        "status": "Stopped",
+        "detail": "996 accepted; SFT9 paused"
       }
     ],
     "paths": [
@@ -79,7 +79,11 @@
         "value": "/home/xturbo/celia-runs/celia-a0.2-sft/a0.2.1-sft8b-complete-ca8-v1-lora-r32-lr7e-5-plateau-p0-2p5epoch-2026-06-07-1727"
       },
       {
-        "label": "CA9 output root",
+        "label": "CA9 accepted pool",
+        "value": "/home/xturbo/moni-talk-models/celia/adapters/ca/celia-ca-9/staging/ca9_accepted1600_judge_writer_b2_2026_06_07/accepted_keep_1600.jsonl"
+      },
+      {
+        "label": "CA9 judge root",
         "value": "/home/xturbo/judge-runs/celia-current-benchmark-evals/ca-feedback-2026-06-07/judge-v1.5.0-r2-combined/ca9-batch2-accepted1600-judge-writer-b2"
       }
     ]
