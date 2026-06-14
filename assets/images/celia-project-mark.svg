@@ -1,0 +1,31 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">The Celia Project mark</title>
+  <desc id="desc">A warm amber leaf, a teal signal arc, and a guiding star.</desc>
+  <defs>
+    <linearGradient id="leaf" x1="43" y1="127" x2="91" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3EC6B7"/>
+      <stop offset="0.42" stop-color="#F2B84B"/>
+      <stop offset="1" stop-color="#FFE6A7"/>
+    </linearGradient>
+    <linearGradient id="arcA" x1="18" y1="82" x2="141" y2="82" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2B84B"/>
+      <stop offset="1" stop-color="#65E0D1"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.95 0 1 0 0 0.62 0 0 1 0 0.18 0 0 0 0.65 0"/>
+      <feBlend in="SourceGraphic" mode="screen"/>
+    </filter>
+  </defs>
+  <rect width="160" height="160" rx="42" fill="#07131A"/>
+  <path d="M35 122C18 99 18 60 40 36" stroke="url(#arcA)" stroke-width="7" stroke-linecap="round" opacity="0.92"/>
+  <path d="M124 37C141 60 141 99 119 123" stroke="url(#arcA)" stroke-width="7" stroke-linecap="round" opacity="0.92"/>
+  <path d="M80 120V48" stroke="url(#leaf)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M80 95C62 93 49 83 43 66C62 68 75 78 80 95Z" fill="url(#leaf)"/>
+  <path d="M80 95C98 93 111 83 117 66C98 68 85 78 80 95Z" fill="url(#leaf)"/>
+  <path d="M80 76C67 74 57 66 52 53C67 55 77 63 80 76Z" fill="url(#leaf)" opacity="0.96"/>
+  <path d="M80 76C93 74 103 66 108 53C93 55 83 63 80 76Z" fill="url(#leaf)" opacity="0.96"/>
+  <path d="M80 51C92 48 97 43 100 31C103 43 108 48 120 51C108 54 103 59 100 71C97 59 92 54 80 51Z" fill="#FFE6A7" filter="url(#glow)"/>
+  <circle cx="126" cy="54" r="5" fill="#65E0D1"/>
+  <circle cx="80" cy="38" r="4" fill="#FFE6A7"/>
+</svg>

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Font options · The Celia Project</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Fontshare -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700&f[]=cabinet-grotesk@700,800&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --ink: #0b1437;
+        --muted: #5a6685;
+        --line: rgba(20, 30, 80, 0.12);
+        --vibe: linear-gradient(105deg, #4f46e5 0%, #d6248b 48%, #f5a31e 100%);
+        --gold: #e0a11e;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Inter", system-ui, sans-serif;
+        background:
+          radial-gradient(120% 80% at 90% -10%, rgba(245, 163, 30, 0.12), transparent 55%),
+          radial-gradient(110% 80% at 0% 0%, rgba(79, 70, 229, 0.12), transparent 50%),
+          linear-gradient(180deg, #fbfcff, #eef2fc);
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { width: min(1080px, calc(100% - 40px)); margin: 0 auto; padding: 56px 0 96px; }
+      .page-head { max-width: 760px; margin-bottom: 40px; }
+      .page-head .kicker {
+        font-family: "Space Grotesk", monospace;
+        font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+        color: #4f46e5;
+      }
+      .page-head h1 { margin: 10px 0 0; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; letter-spacing: -0.03em; }
+      .page-head p { margin: 14px 0 0; color: var(--muted); font-size: 1.05rem; line-height: 1.6; }
+
+      .card {
+        position: relative;
+        margin-top: 26px;
+        padding: clamp(26px, 4vw, 44px);
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        box-shadow: 0 26px 70px rgba(15, 30, 80, 0.10);
+        overflow: hidden;
+      }
+      .card::before {
+        content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--vibe);
+      }
+      .tag {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-family: "Space Grotesk", monospace; font-size: 0.74rem; font-weight: 700;
+        letter-spacing: 0.04em; color: #fff; padding: 6px 14px; border-radius: 999px;
+        background: var(--vibe);
+      }
+      .fonts-note { margin-left: 12px; color: var(--muted); font-size: 0.84rem; font-family: "Space Grotesk", monospace; }
+
+      .sample-title {
+        margin: 22px 0 0; font-family: var(--disp); font-weight: var(--disp-w, 700);
+        font-size: clamp(2.6rem, 6.5vw, 4.6rem); line-height: 0.95; letter-spacing: var(--disp-ls, -0.03em);
+      }
+      .sample-statement {
+        margin: 16px 0 0; font-family: var(--disp); font-weight: var(--disp-w2, 500);
+        font-size: clamp(1.3rem, 2.8vw, 2rem); line-height: 1.18; letter-spacing: -0.01em; color: #1a2a6b;
+      }
+      .grad { background: var(--vibe); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .sample-lead {
+        margin: 8px 0 0; font-family: var(--disp); font-weight: 600;
+        font-size: clamp(1.15rem, 2vw, 1.55rem); letter-spacing: -0.01em; color: var(--ink);
+      }
+      .sample-body {
+        margin: 14px 0 0; max-width: 60ch; font-family: var(--body); font-weight: 400;
+        font-size: 1.04rem; line-height: 1.7; color: #3c476b;
+      }
+      .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 22px; }
+      .btn {
+        font-family: var(--body); font-weight: 600; font-size: 0.92rem; color: #fff;
+        padding: 11px 18px; border-radius: 999px; border: 0; background: var(--vibe);
+        box-shadow: 0 12px 30px rgba(79, 70, 229, 0.28);
+      }
+      .btn.ghost { color: #4f46e5; background: #fff; border: 1.5px solid rgba(79, 70, 229, 0.35); box-shadow: none; }
+      .chip {
+        font-family: "Space Grotesk", monospace; font-size: 0.72rem; font-weight: 700; color: #1a2a6b;
+        padding: 6px 12px; border-radius: 999px; background: rgba(79, 70, 229, 0.10); border: 1px solid rgba(79, 70, 229, 0.18);
+      }
+      .chip.keep { color: #0b7a3b; background: rgba(16, 160, 88, 0.10); border-color: rgba(16, 160, 88, 0.22); }
+
+      /* ---- Pairings ---- */
+      .f1 { --disp: "Space Grotesk", sans-serif; --body: "Inter", sans-serif; }
+      .f2 { --disp: "Bricolage Grotesque", sans-serif; --body: "Inter", sans-serif; }
+      .f3 { --disp: "Clash Display", sans-serif; --body: "Satoshi", sans-serif; }
+      .f4 { --disp: "Cabinet Grotesk", sans-serif; --disp-w: 800; --body: "General Sans", sans-serif; }
+      .f5 { --disp: "Sora", sans-serif; --body: "Plus Jakarta Sans", sans-serif; }
+      .f6 { --disp: "Unbounded", sans-serif; --disp-w: 600; --disp-w2: 500; --disp-ls: -0.01em; --body: "Hanken Grotesk", sans-serif; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="page-head">
+        <span class="kicker">Type direction · pick one</span>
+        <h1>Six font pairings for Celia</h1>
+        <p>Same content in each card, only the typefaces change. The accent colors are just a placeholder for the &ldquo;vibrant&rdquo; direction &mdash; judge the fonts. Tell me the option number you like (or mix a heading from one with a body from another).</p>
+      </header>
+
+      <!-- 1 -->
+      <section class="card f1">
+        <span class="tag">Option 1</span><span class="fonts-note">Space Grotesk &middot; Inter &mdash; modern, techy, crisp</span>
+        <h2 class="sample-title">The Celia Project</h2>
+        <p class="sample-statement">A Christian tool for <span class="grad">every-day work.</span></p>
+        <p class="sample-lead">A True Foundation</p>
+        <p class="sample-body">We created Celia, a Biblically-based AI assistant, to honor the Lord and answer theological questions accurately &mdash; while still handling the ordinary work of a day.</p>
+        <div class="row"><span class="chip">plainness_over_eloquence</span><span class="chip keep">KEEP</span><button class="btn">Mission</button><button class="btn ghost">Judge Models</button></div>
+      </section>
+
+      <!-- 2 -->
+      <section class="card f2">
+        <span class="tag">Option 2</span><span class="fonts-note">Bricolage Grotesque &middot; Inter &mdash; characterful, editorial, fresh</span>
+        <h2 class="sample-title">The Celia Project</h2>
+        <p class="sample-statement">A Christian tool for <span class="grad">every-day work.</span></p>
+        <p class="sample-lead">A True Foundation</p>
+        <p class="sample-body">We created Celia, a Biblically-based AI assistant, to honor the Lord and answer theological questions accurately &mdash; while still handling the ordinary work of a day.</p>
+        <div class="row"><span class="chip">plainness_over_eloquence</span><span class="chip keep">KEEP</span><button class="btn">Mission</button><button class="btn ghost">Judge Models</button></div>
+      </section>
+
+      <!-- 3 -->
+      <section class="card f3">
+        <span class="tag">Option 3</span><span class="fonts-note">Clash Display &middot; Satoshi &mdash; bold, confident, startup-modern</span>
+        <h2 class="sample-title">The Celia Project</h2>
+        <p class="sample-statement">A Christian tool for <span class="grad">every-day work.</span></p>
+        <p class="sample-lead">A True Foundation</p>
+        <p class="sample-body">We created Celia, a Biblically-based AI assistant, to honor the Lord and answer theological questions accurately &mdash; while still handling the ordinary work of a day.</p>
+        <div class="row"><span class="chip">plainness_over_eloquence</span><span class="chip keep">KEEP</span><button class="btn">Mission</button><button class="btn ghost">Judge Models</button></div>
+      </section>
+
+      <!-- 4 -->
+      <section class="card f4">
+        <span class="tag">Option 4</span><span class="fonts-note">Cabinet Grotesk &middot; General Sans &mdash; refined, premium, geometric</span>
+        <h2 class="sample-title">The Celia Project</h2>
+        <p class="sample-statement">A Christian tool for <span class="grad">every-day work.</span></p>
+        <p class="sample-lead">A True Foundation</p>
+        <p class="sample-body">We created Celia, a Biblically-based AI assistant, to honor the Lord and answer theological questions accurately &mdash; while still handling the ordinary work of a day.</p>
+        <div class="row"><span class="chip">plainness_over_eloquence</span><span class="chip keep">KEEP</span><button class="btn">Mission</button><button class="btn ghost">Judge Models</button></div>
+      </section>
+
+      <!-- 5 -->
+      <section class="card f5">
+        <span class="tag">Option 5</span><span class="fonts-note">Sora &middot; Plus Jakarta Sans &mdash; geometric, friendly, approachable</span>
+        <h2 class="sample-title">The Celia Project</h2>
+        <p class="sample-statement">A Christian tool for <span class="grad">every-day work.</span></p>
+        <p class="sample-lead">A True Foundation</p>
+        <p class="sample-body">We created Celia, a Biblically-based AI assistant, to honor the Lord and answer theological questions accurately &mdash; while still handling the ordinary work of a day.</p>
+        <div class="row"><span class="chip">plainness_over_eloquence</span><span class="chip keep">KEEP</span><button class="btn">Mission</button><button class="btn ghost">Judge Models</button></div>
+      </section>
+
+      <!-- 6 -->
+      <section class="card f6">
+        <span class="tag">Option 6</span><span class="fonts-note">Unbounded &middot; Hanken Grotesk &mdash; expressive, playful, high-energy</span>
+        <h2 class="sample-title">The Celia Project</h2>
+        <p class="sample-statement">A Christian tool for <span class="grad">every-day work.</span></p>
+        <p class="sample-lead">A True Foundation</p>
+        <p class="sample-body">We created Celia, a Biblically-based AI assistant, to honor the Lord and answer theological questions accurately &mdash; while still handling the ordinary work of a day.</p>
+        <div class="row"><span class="chip">plainness_over_eloquence</span><span class="chip keep">KEEP</span><button class="btn">Mission</button><button class="btn ghost">Judge Models</button></div>
+      </section>
+    </div>
+  </body>
+</html>

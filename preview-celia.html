@@ -3,10 +3,80 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>The Celia Project</title>
-    <meta name="description" content="A warm futuristic prototype site for The Celia Project.">
+    <title>Proposed Landing · The Celia Project</title>
     <link rel="icon" href="assets/images/celia-project-mark.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/css/styles.css?v=6.9">
+    <style>
+      /* ---- Proposed palette: warm parchment + real yellow-gold ---- */
+      body.page-landing {
+        --canvas-1: #fdfaf3;
+        --canvas-2: #f7f0e2;
+        --canvas-3: #efe3cd;
+        --brass: #f2b01e;
+        --brass-soft: #ffd24a;
+        --brass-deep: #b8780f;
+        --line: rgba(20, 33, 63, 0.14);
+        --grid: rgba(176, 120, 15, 0.06);
+        --wash: rgba(242, 176, 30, 0.16);
+        --stripe-1: rgba(242, 176, 30, 0.10);
+        --stripe-2: rgba(26, 79, 214, 0.10);
+      }
+      body.page-landing .warm-gradient {
+        background: linear-gradient(100deg, #ffd24a 0%, #f2b01e 48%, #c8870c 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+      }
+      body.page-landing .leap-stat strong {
+        background: linear-gradient(120deg, #f2b01e, #c8870c);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      /* ---- Celia in action ---- */
+      .celia-band { display: grid; gap: clamp(18px, 2.4vw, 28px); padding: clamp(34px, 5vh, 64px) 0 0; }
+      .celia-band-head { max-width: 720px; display: grid; gap: 10px; }
+      .celia-band-head .lead {
+        margin: 0; font-family: var(--font-display); font-size: clamp(1.36rem, 2.7vw, 2rem);
+        font-weight: 600; letter-spacing: -0.014em; color: var(--title);
+      }
+      .celia-band-head p:not(.lead) {
+        margin: 0; color: rgba(7, 21, 47, 0.7); font-size: clamp(1rem, 1.3vw, 1.1rem); line-height: 1.6;
+      }
+      .celia-demo {
+        display: grid; gap: 20px; padding: clamp(22px, 2.6vw, 34px);
+        border: 1px solid var(--line); border-radius: var(--round-xl);
+        background: linear-gradient(160deg, #ffffff, rgba(247, 240, 226, 0.55));
+        box-shadow: var(--shadow);
+      }
+      .celia-label {
+        display: block; margin-bottom: 8px; font-family: var(--font-mono);
+        font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+        color: rgba(7, 24, 63, 0.48);
+      }
+      .celia-line--user p {
+        margin: 0; padding: 16px 18px; border-radius: 16px 16px 16px 4px;
+        background: rgba(26, 79, 214, 0.07); border: 1px solid rgba(26, 79, 214, 0.16);
+        color: var(--ink); font-size: clamp(1rem, 1.2vw, 1.1rem); line-height: 1.55;
+      }
+      .celia-line--celia { position: relative; }
+      .celia-line--celia p {
+        position: relative; margin: 0; padding: 18px 20px 18px 22px;
+        border-radius: 16px 16px 4px 16px; background: #ffffff;
+        border: 1px solid rgba(176, 120, 15, 0.30); box-shadow: 0 14px 40px rgba(20, 33, 63, 0.07);
+        color: var(--ink); font-size: clamp(1.02rem, 1.25vw, 1.14rem); line-height: 1.62;
+      }
+      .celia-line--celia p::before {
+        content: ""; position: absolute; left: 0; top: 16px; bottom: 16px; width: 3px;
+        border-radius: 999px; background: linear-gradient(180deg, #f2b01e, #1a4fd6);
+      }
+      .celia-verse {
+        display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+        padding: 7px 13px; border-radius: 999px; background: rgba(242, 176, 30, 0.14);
+        border: 1px solid rgba(176, 120, 15, 0.30); font-size: 0.86rem; color: #b8780f;
+      }
+      .celia-verse b { font-family: var(--font-mono); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.04em; }
+    </style>
   </head>
   <body class="page-landing">
     <header class="topbar">
@@ -39,6 +109,24 @@
             <a class="button button--judges" href="judges.html">Judge Models</a>
             <a class="button button--roadmap" href="roadmap.html">News</a>
             <a class="button button--contact" href="contact.html">Contact</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="site-shell celia-band reveal" aria-label="Celia in action">
+        <div class="celia-band-head">
+          <p class="lead">Celia in Action</p>
+          <p>Here is Celia answering an everyday question&mdash;the kind of thing you might actually ask.</p>
+        </div>
+        <div class="celia-demo">
+          <div class="celia-line celia-line--user">
+            <span class="celia-label">You</span>
+            <p>I have to give a coworker some hard feedback tomorrow and I&rsquo;m dreading it. How do I do it without being a jerk?</p>
+          </div>
+          <div class="celia-line celia-line--celia">
+            <span class="celia-label">Celia</span>
+            <p>Dreading it usually means you actually care about them&mdash;hold onto that. Lead with the one thing that needs to change and say it plainly; don&rsquo;t bury it under so much padding that the point gets lost. Keep it about the work, not their character, and make it clear you&rsquo;re on their side. Scripture puts it as &ldquo;speaking the truth in love&rdquo;: the truth keeps you honest, the love keeps you kind. You can do both in one sentence.</p>
+            <span class="celia-verse"><b>Ephesians 4:15</b> &middot; speaking the truth in love</span>
           </div>
         </div>
       </section>
@@ -99,13 +187,12 @@
 
       <section class="site-shell leap-section reveal">
         <div class="essay">
-          <p>V1.5.0-r2-combined is the best judge we have built so far, and around 70% of its training pairs were synthetically created and added through <a class="gloss-link" href="#g-autogen">AutoGen</a>. It belongs to the Gemma adapter line, which is currently our strongest evaluator and quality gate. The separate Comma Alpha line is where we are testing owned-model training: promising for licensing and long-term formation, but still far weaker today and not yet ready to replace the Gemma judge.</p>
-          <p>That split is important. Gemma V1.5.0-r2-combined grades incoming data and aced both <a class="gloss-link" href="#g-dev">Dev V1.2</a> and <a class="gloss-link" href="#g-holdout">Holdout V1.2</a>; Comma Alpha exposes what still has to be solved at the model level, especially single-answer formatting and ordinary Christian reasoning.</p>
+          <p>V1.5.0-r2-combined is the best judge we have built so far, and around 70% of its training pairs were synthetically created and added through <a class="gloss-link" href="#g-autogen">AutoGen</a>. It belongs to the Gemma adapter line, which remains our strongest evaluator and quality gate. The separate Comma Alpha line is where we are testing owned-model training: promising for licensing and long-term formation, but still far weaker today and not yet ready to replace the Gemma judge.</p>
         </div>
         <div class="leap-stats" aria-label="V1.5.0-r2-combined results">
           <div class="leap-stat">
             <strong>80 / 80</strong>
-            <span>A full score on Dev and the sealed Holdout&mdash;no false keeps, no misses.</span>
+            <span>A perfect score on Dev and the sealed Holdout&mdash;no false keeps, no misses.</span>
           </div>
           <div class="leap-stat">
             <strong>1,877</strong>
@@ -116,26 +203,6 @@
             <span>Rows we stepped in to cut by hand&mdash;the only curation it still needed.</span>
           </div>
         </div>
-      </section>
-
-      <section class="site-shell section reveal">
-        <div class="section-heading">
-          <h2>Glossary</h2>
-        </div>
-        <dl class="glossary-list">
-          <div class="glossary-row" id="g-dev">
-            <dt>Dev V1.2</dt>
-            <dd>A fixed set of forty graded examples used while tuning a judge. The judge is allowed to learn against these, so a strong Dev score alone does not prove much.</dd>
-          </div>
-          <div class="glossary-row" id="g-holdout">
-            <dt>Holdout V1.2</dt>
-            <dd>A second fixed set of forty graded examples kept sealed during training. Because the judge never sees it while learning, the Holdout score is the better evidence that it generalizes.</dd>
-          </div>
-          <div class="glossary-row" id="g-autogen">
-            <dt>AutoGen (AG)</dt>
-            <dd>Machine-generated candidate responses, each screened by the current judge and confirmed by a human before any enter training. AG1 through AG10 built the current Gemma capstone; later AG sets are now part of the Comma/owned-model experiments.</dd>
-          </div>
-        </dl>
       </section>
     </main>
 

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Judge Models | The Celia Project</title>
+    <meta name="description" content="The judge models that gate Celia's training data.">
+    <link rel="icon" href="assets/images/celia-project-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/css/styles.css?v=6.9">
+  </head>
+  <body class="page-judges">
+    <header class="topbar">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href="index.html"><img src="assets/images/celia-logo-transparent-v2.png" alt="The Celia Project"></a>
+        <div class="nav-links">
+          <a href="index.html">Landing</a>
+          <a href="mission.html">Mission</a>
+          <a href="judges.html">Judge Models</a>
+          <a href="roadmap.html">News</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="site-shell">
+      <section class="page-hero page-hero--bare">
+        <h1 class="big-title">Judge Models</h1>
+      </section>
+
+      <section class="section reveal">
+        <div class="essay">
+          <p>A judge model reviews each candidate response and labels it <a class="gloss-link" href="#g-keep">KEEP</a> or <a class="gloss-link" href="#g-reject">REJECT</a> against Celia&rsquo;s standard. Only approved pairs enter the training set. The current work now has two separate Series: the Gemma Series, which contains our strongest judges, and the Comma Alpha Series, which is our first owned-model experiment.</p>
+          <p>The Gemma Series and Comma Alpha Series are treated as two independent sub-projects. We do not believe comparing the results from drastically different base models on one metric is fair. Instead, we are working to improve both models&rsquo; weaknesses: Gemma&rsquo;s being secular-based answers and Comma&rsquo;s lack of logic and sophisticated reasoning.</p>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="line-grid">
+          <article class="line-card line-card--primary">
+            <div class="judge-head">
+              <span class="judge-label">Gemma Series</span>
+              <h2 class="judge-name">V1.5.0-r2-combined</h2>
+            </div>
+            <p>V1.5.0-r2-combined is the current best judge in the project. It is a Gemma 4 31B adapter trained from AG1-AG10 and MI1-MI5, with 1,877 trusted training pairs and 40/40 on both Dev V1.2 and Holdout V1.2.</p>
+            <div class="line-stats" aria-label="Gemma judge results">
+              <span><strong>80 / 80</strong> Dev + Holdout</span>
+              <span><strong>1,877</strong> training pairs</span>
+              <span><strong>AG1-AG10</strong> + MI1-MI5</span>
+            </div>
+          </article>
+
+          <article class="line-card">
+            <div class="judge-head">
+              <span class="judge-label">Comma Alpha Series</span>
+              <h2 class="judge-name">Celia A0.1.2</h2>
+            </div>
+            <p>The Comma Alpha Series is a different experiment: start from Comma v0.1-2T, then apply <a class="gloss-link" href="#g-dapt">DAPT</a> &mdash; domain-adaptive pretraining &mdash; on four versions of the Bible and more than ten Christian public-domain works, then add our best SFT adapter. That adapter began as a judge trained on Comma, and because it has seen thousands of Celia responses, the same model can also answer as Celia.</p>
+            <p>The Comma Alpha Series is a promising pathway to our first effective iteration of Celia. Major improvements are being made daily to reinforce the base model&rsquo;s communication skills and Christian foundation, and our internal benchmarks are promising for the model&rsquo;s size.</p>
+            <p class="line-note">The public score is still catching up to the model: our first scoring run was capped by a chat-template bug&mdash;since patched&mdash;so we&rsquo;ll post a corrected Theology Test result shortly.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="essay essay--wide">
+          <p class="lead">Gemma Series</p>
+          <p>We evaluate the Gemma judges on two fixed sets of forty graded examples, <a class="gloss-link" href="#g-dev">Dev V1.2</a> and <a class="gloss-link" href="#g-holdout">Holdout V1.2</a>. The latest model, V1.5.0-r2-combined, scored 80/80 across both benchmarks.</p>
+        </div>
+        <div class="chart-duo">
+          <figure class="chart-card">
+            <div class="bars" role="img" aria-label="Benchmark score out of 80: V1.5.0 scores 64, V1.5.0-r2 scores 67, V1.5.0-r2-combined scores 80">
+              <div class="bar"><div class="bar-track"><span class="bar-col" style="height:80%"><span class="bar-val">64 / 80</span></span></div><span class="bar-label">V1.5.0</span></div>
+              <div class="bar"><div class="bar-track"><span class="bar-col" style="height:83.75%"><span class="bar-val">67 / 80</span></span></div><span class="bar-label">V1.5.0-r2</span></div>
+              <div class="bar"><div class="bar-track"><span class="bar-col" style="height:100%"><span class="bar-val">80 / 80</span></span></div><span class="bar-label">V1.5.0-r2-combined</span></div>
+            </div>
+            <figcaption>Benchmark score &middot; <a class="gloss-link" href="#g-dev">Dev V1.2</a> + <a class="gloss-link" href="#g-holdout">Holdout V1.2</a>, out of 80</figcaption>
+          </figure>
+          <figure class="chart-card">
+            <div class="bars" role="img" aria-label="Training pairs by judge: V1.5.0 has 448, V1.5.0-r2 has 1,162, V1.5.0-r2-combined has 1,877">
+              <div class="bar"><div class="bar-track"><span class="bar-col" style="height:23.9%"><span class="bar-val">448</span></span></div><span class="bar-label">V1.5.0</span></div>
+              <div class="bar"><div class="bar-track"><span class="bar-col" style="height:61.9%"><span class="bar-val">1,162</span></span></div><span class="bar-label">V1.5.0-r2</span></div>
+              <div class="bar"><div class="bar-track"><span class="bar-col" style="height:100%"><span class="bar-val">1,877</span></span></div><span class="bar-label">V1.5.0-r2-combined</span></div>
+            </div>
+            <figcaption>Training pairs per model &middot; the <a class="gloss-link" href="#g-autogen">AutoGen</a> Gemma Series</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="essay essay--wide">
+          <p class="lead">Comma Alpha Series</p>
+          <p>Comma Alpha isn&rsquo;t scored on <a class="gloss-link" href="#g-dev">Dev V1.2</a> or <a class="gloss-link" href="#g-holdout">Holdout V1.2</a>&mdash;those sets gate our production judges. We measure it with Theology Test V1.0, which asks whether ordinary, everyday answers carry Christian instincts on their own, with no system prompt to lean on.</p>
+          <p>At this early stage, our internal benchmarks show real room to grow&mdash;in both communication skills and Christian-grounded answers. The base model improves daily, and we&rsquo;ll publish Comma&rsquo;s Theology Test results once they reflect where the model actually stands.</p>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="section-heading">
+          <h2>Glossary</h2>
+        </div>
+        <dl class="glossary-list">
+          <div class="glossary-row" id="g-keep">
+            <dt>KEEP</dt>
+            <dd>The judge&rsquo;s verdict that a response meets Celia&rsquo;s standard and belongs in the training set.</dd>
+          </div>
+          <div class="glossary-row" id="g-reject">
+            <dt>REJECT</dt>
+            <dd>The judge&rsquo;s verdict that a response fails for a specific, named reason and is kept out of the training set.</dd>
+          </div>
+          <div class="glossary-row" id="g-dev">
+            <dt>Dev V1.2</dt>
+            <dd>A fixed set of forty graded examples used while tuning a judge. The judge is allowed to learn against these.</dd>
+          </div>
+          <div class="glossary-row" id="g-holdout">
+            <dt>Holdout V1.2</dt>
+            <dd>A second fixed set of forty graded examples kept sealed during training, used to measure how a judge generalizes.</dd>
+          </div>
+          <div class="glossary-row" id="g-autogen">
+            <dt>AutoGen (AG)</dt>
+            <dd>Machine-generated candidate responses, each screened by the current judge and confirmed by a reviewer before entering training. The Gemma capstone uses AG1 through AG10; later AG sets are now feeding the Comma/owned-model experiments.</dd>
+          </div>
+          <div class="glossary-row" id="g-mi">
+            <dt>MI (migrated)</dt>
+            <dd>A migrated data set: training pairs from older judge models that V1.5.0-r2-combined re-evaluated and judged fit to keep, so they were carried forward into its training set. MI1 through MI5 are those migrated batches.</dd>
+          </div>
+          <div class="glossary-row" id="g-dapt">
+            <dt>DAPT</dt>
+            <dd>Domain-adaptive pretraining: continuing a base model&rsquo;s pretraining on a focused corpus&mdash;here, four versions of the Bible and more than ten Christian public-domain works&mdash;so its instincts shift toward that domain before any instruction tuning.</dd>
+          </div>
+        </dl>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="site-shell footer-grid">
+        <div class="footer-brand">
+          <a class="footer-mark" href="index.html"><img src="assets/images/celia-logo-transparent-v2.png" alt="The Celia Project"></a>
+          <p>A Christian AI assistant for the ordinary work of a day&mdash;drafting, thinking, deciding, getting unstuck&mdash;grounded in Scripture and built to stay faithful to it. The model does the work; the judge keeps its voice honest.</p>
+        </div>
+        <nav class="footer-nav" aria-label="Footer navigation">
+          <span class="footer-heading">Explore</span>
+          <a href="index.html">Landing</a>
+          <a href="mission.html">Mission</a>
+          <a href="judges.html">Judge Models</a>
+          <a href="roadmap.html">News</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+      <div class="site-shell footer-verse">
+        <blockquote>So neither the one who plants nor the one who waters is anything, but only God, who makes things grow. The one who plants and the one who waters have one purpose, and they will each be rewarded according to their own labor. For we are co-workers in God&rsquo;s service; you are God&rsquo;s field, God&rsquo;s building.</blockquote>
+        <cite class="verse-ref">1 Corinthians 3:7&ndash;9 &middot; NIV</cite>
+      </div>
+      <div class="site-shell footer-base">
+        <span>The Celia Project — research prototype</span>
+        <span>Careful voice. Human curation. Christian judgment.</span>
+      </div>
+    </footer>
+    <script src="assets/js/site.js?v=6.9"></script>
+  </body>
+</html>
