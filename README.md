@@ -1,7 +1,8 @@
 # The Celia Project
 
 A static public site for The Celia Project, including the landing page, mission
-page, judge overview, news archive, contact page, and preview page.
+page, judge overview, news archive, contact page, and preview page. The current
+visual direction is a clean white-and-gold public presentation.
 
 ## Open
 
