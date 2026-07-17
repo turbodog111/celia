@@ -3,140 +3,326 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>The Celia Project</title>
-    <meta name="description" content="A warm futuristic prototype site for The Celia Project.">
+    <title>Celia Model Registry | The Celia Project</title>
+    <meta name="description" content="Full technical registry of every Celia-C and Celia-Mini-C model: architecture, training settings, corpus composition, results, and the deltas between sequential models.">
     <link rel="icon" href="assets/images/celia-project-mark.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/css/styles.css?v=7.0">
+    <style>
+      .reg-hero { padding: 8px 0 4px; }
+      .reg-hero h1 { margin: 0 0 8px; font-family: var(--font-display); font-size: clamp(1.9rem, 4vw, 2.8rem); color: var(--ink); letter-spacing: -0.01em; }
+      .reg-lede { color: var(--muted); max-width: 70ch; line-height: 1.55; margin: 0 0 14px; }
+      .reg-legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 10px 0 4px; font-size: 12px; color: var(--muted); }
+      .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 2px 9px; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; border: 1px solid var(--line); }
+      .badge--done { background: rgba(20,92,255,.10); color: var(--ink-3); }
+      .badge--training { background: rgba(0,163,255,.14); color: #0b6ea8; border-color: rgba(0,163,255,.35); }
+      .badge--planned { background: rgba(82,102,129,.12); color: var(--muted); }
+      .badge--fail { background: rgba(180,40,40,.10); color: #9a2828; border-color: rgba(180,40,40,.28); }
+      .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+      .dot--done { background: var(--ink-3); } .dot--training { background: #00a3ff; } .dot--planned { background: var(--muted); }
+
+      .reg-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 14px; border-bottom: 1px solid var(--line); }
+      .reg-tab { border: 1px solid var(--line); border-bottom: none; background: rgba(255,255,255,.5); color: var(--muted); border-radius: 12px 12px 0 0; padding: 9px 15px; font: inherit; font-weight: 800; font-size: 13px; cursor: pointer; }
+      .reg-tab[aria-selected="true"] { background: var(--gold); color: #fff; border-color: var(--gold); }
+      .reg-panel { display: none; animation: fade .25s ease; }
+      .reg-panel[data-active="true"] { display: block; }
+      @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+      .tbl-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.6); }
+      table.reg { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 720px; }
+      table.reg th, table.reg td { text-align: left; padding: 9px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+      table.reg thead th { position: sticky; top: 0; background: var(--paper); color: var(--ink); font-weight: 800; font-size: 12px; z-index: 2; }
+      table.reg tbody th { position: sticky; left: 0; background: var(--paper); color: var(--ink-2); font-weight: 700; white-space: nowrap; z-index: 1; }
+      table.reg .grp td { background: rgba(20,92,255,.06); color: var(--ink-3); font-weight: 900; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+      table.reg td.val { font-family: var(--font-mono); font-size: 12px; color: var(--ink); }
+      table.reg td.tbd { color: var(--muted); font-style: italic; }
+      .col-hi { background: rgba(0,163,255,.06); }
+
+      .cards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      .card { border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.72); padding: 16px 16px 6px; }
+      .card h3 { margin: 0 0 2px; font-family: var(--font-display); font-size: 1.25rem; color: var(--ink); }
+      .card .sub { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
+      .card h4 { margin: 12px 0 4px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+      .kv { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      .kv td { padding: 3px 0; border-bottom: 1px dotted var(--line); vertical-align: top; }
+      .kv td:first-child { color: var(--muted); width: 46%; padding-right: 10px; }
+      .kv td:last-child { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink); }
+      .note { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 10px 0 6px; }
+
+      .delta-lead { color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
+      table.delta td.chg { font-weight: 800; }
+      .chg-up { color: #0b6ea8; } .chg-key { color: var(--ink-3); }
+      .reg-foot-note { color: var(--muted); font-size: 11.5px; margin-top: 22px; line-height: 1.5; }
+    </style>
   </head>
-  <body class="page-landing">
+  <body class="page-roadmap">
     <header class="topbar">
       <nav class="nav" aria-label="Primary navigation">
         <a class="brand" href="index.html"><img src="assets/images/celia-logo-transparent-v2.png" alt="The Celia Project"></a>
         <div class="nav-links">
-          <a href="index.html">Landing</a>
-          <a href="mission.html">Mission</a>
-          <a href="judges.html">Judge Models</a>
-          <a href="roadmap.html">News</a>
-          <a href="contact.html">Contact</a>
+          <span style="color:var(--muted);font-weight:800;font-size:13px;letter-spacing:.04em;">MODEL REGISTRY</span>
         </div>
       </nav>
     </header>
 
-    <main>
-      <section class="site-shell landing-hero">
-        <div class="hero-copy">
-          <h1 class="landing-title">The Celia Project</h1>
-          <p class="landing-statement">A Christian Tool for <span class="warm-gradient">Every-Day Work</span></p>
-          <p class="lede">
-            We created Celia, a Biblically-based AI assistant, to honor the Lord and have the capacity to answer
-            theological questions accurately. When we looked into the current AI space, we noticed a scarcity of
-            Christian LLMs that were also capable of every-day work. That&rsquo;s why we at The Celia Project created an
-            AI that is rooted in Christian theology, defending its trustworthiness, that is also capable of every-day
-            questions, problems, and conversations.
-          </p>
-          <div class="button-row">
-            <a class="button button--mission" href="mission.html">Mission</a>
-            <a class="button button--judges" href="judges.html">Judge Models</a>
-            <a class="button button--roadmap" href="roadmap.html">News</a>
-            <a class="button button--contact" href="contact.html">Contact</a>
-          </div>
+    <main class="site-shell">
+      <section class="reg-hero reveal">
+        <h1>Celia Model Registry</h1>
+        <p class="reg-lede">Every Celia-C (main) and Celia-Mini-C (fast-iteration probe) model, with the full architecture, training configuration, corpus composition, and measured results &mdash; plus the deltas between sequential models. Figures are drawn from run configs, materialization manifests, and gauntlet scores; in-progress and planned models are marked as such.</p>
+        <div class="reg-legend">
+          <span><span class="badge badge--done">complete</span> trained &amp; evaluated</span>
+          <span><span class="badge badge--training">training</span> running now, results pending</span>
+          <span><span class="badge badge--planned">planned</span> projected specs, not started</span>
+          <span><span class="badge badge--fail">not serviceable</span> completed but degenerate (diagnostic)</span>
         </div>
       </section>
 
-      <section class="site-shell shift-band reveal" aria-label="Theology Test: base model versus Celia">
-        <div class="shift-head">
-          <p class="lead">Watch the Worldview Shift</p>
-          <p>Our Theology Test asks twenty ordinary, everyday questions&mdash;no Christian system prompt, no hint of what we&rsquo;re after&mdash;then a human scores whether the answer&rsquo;s instincts come out Christian on their own. Same question, the plain base model against a Celia checkpoint, with the real score each one earned.</p>
+      <div class="reg-tabs" role="tablist">
+        <button class="reg-tab" role="tab" aria-selected="true" data-tab="overview">Overview matrix</button>
+        <button class="reg-tab" role="tab" aria-selected="false" data-tab="cards">Model cards</button>
+        <button class="reg-tab" role="tab" aria-selected="false" data-tab="deltas">Deltas</button>
+      </div>
+
+      <!-- ============ OVERVIEW MATRIX ============ -->
+      <section class="reg-panel" data-panel="overview" data-active="true">
+        <div class="tbl-scroll">
+          <table class="reg">
+            <thead>
+              <tr>
+                <th>Specification</th>
+                <th>Celia-C0.1</th>
+                <th>Celia-Mini-C0.1</th>
+                <th class="col-hi">Celia-Mini-C0.2</th>
+                <th>Celia-C0.2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="grp"><td colspan="5">Identity</td></tr>
+              <tr><th>Series</th><td>C &middot; main</td><td>Mini-C &middot; probe</td><td class="col-hi">Mini-C &middot; probe</td><td>C &middot; main</td></tr>
+              <tr><th>Status</th>
+                <td><span class="badge badge--fail">not serviceable</span></td>
+                <td><span class="badge badge--fail">not serviceable</span></td>
+                <td class="col-hi"><span class="badge badge--training">training</span></td>
+                <td><span class="badge badge--planned">planned</span></td></tr>
+              <tr><th>Recipe probed</th><td class="val">&mdash;</td><td class="val">C0.1</td><td class="val col-hi">C0.2</td><td class="val">&mdash;</td></tr>
+
+              <tr class="grp"><td colspan="5">Parameters &amp; architecture</td></tr>
+              <tr><th>Parameters</th><td class="val">125,077,824</td><td class="val">50,016,768</td><td class="val col-hi">50,018,304</td><td class="tbd">TBD (125M candidate)</td></tr>
+              <tr><th>Hidden size</th><td class="val">576</td><td class="val">512</td><td class="val col-hi">512</td><td class="val">576 (planned)</td></tr>
+              <tr><th>Layers</th><td class="val">30</td><td class="val">12</td><td class="val col-hi">12</td><td class="val">30 (planned)</td></tr>
+              <tr><th>Attn heads / KV heads</th><td class="val">9 / 3</td><td class="val">8 / 2</td><td class="val col-hi">8 / 2</td><td class="val">9 / 3 (planned)</td></tr>
+              <tr><th>Head dim</th><td class="val">64</td><td class="val">64</td><td class="val col-hi">64</td><td class="val">64</td></tr>
+              <tr><th>Intermediate (MLP)</th><td class="val">1536</td><td class="val">1376</td><td class="val col-hi">1376</td><td class="tbd">TBD</td></tr>
+              <tr><th>Activation</th><td class="val">SwiGLU</td><td class="val">SwiGLU</td><td class="val col-hi">SwiGLU</td><td class="val">SwiGLU</td></tr>
+              <tr><th>Norm</th><td class="val">RMSNorm (1e-6)</td><td class="val">RMSNorm (1e-6)</td><td class="val col-hi">RMSNorm (1e-6)</td><td class="val">RMSNorm</td></tr>
+              <tr><th>Positional</th><td class="val">RoPE &theta;=10000</td><td class="val">RoPE &theta;=10000</td><td class="val col-hi">RoPE &theta;=10000</td><td class="val">RoPE</td></tr>
+              <tr><th>Vocab size</th><td class="val">32,768</td><td class="val">32,768</td><td class="val col-hi">32,771 (+3 roles)</td><td class="val">32,771</td></tr>
+              <tr><th>Context length</th><td class="val">2048</td><td class="val">2048</td><td class="val col-hi">2048</td><td class="val">2048</td></tr>
+              <tr><th>Embeddings</th><td class="val">tied</td><td class="val">tied</td><td class="val col-hi">tied</td><td class="val">tied</td></tr>
+
+              <tr class="grp"><td colspan="5">Training configuration</td></tr>
+              <tr><th>Train tokens</th><td class="val">2,501,509,120</td><td class="val">1,000,275,968</td><td class="val col-hi">994,996,224</td><td class="tbd">2.5B&ndash;5B (TBD)</td></tr>
+              <tr><th>Chinchilla ratio</th><td class="val">~20:1</td><td class="val">~20:1</td><td class="val col-hi">~20:1</td><td class="tbd">20:1&ndash;40:1</td></tr>
+              <tr><th>Batch size</th><td class="val">32</td><td class="val">64</td><td class="val col-hi">64</td><td class="val">64 (planned)</td></tr>
+              <tr><th>Peak / min LR</th><td class="val">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td><td class="val col-hi">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td></tr>
+              <tr><th>Schedule / warmup</th><td class="val">cosine / 1%</td><td class="val">cosine / 1%</td><td class="val col-hi">cosine / 1%</td><td class="val">cosine / 1%</td></tr>
+              <tr><th>Weight decay</th><td class="val">0.1</td><td class="val">0.1</td><td class="val col-hi">0.1</td><td class="val">0.1</td></tr>
+              <tr><th>Optimizer</th><td class="val">AdamW (0.9, 0.95)</td><td class="val">AdamW (0.9, 0.95)</td><td class="val col-hi">AdamW (0.9, 0.95)</td><td class="val">AdamW</td></tr>
+              <tr><th>Grad clip</th><td class="val">1.0</td><td class="val">1.0</td><td class="val col-hi">1.0</td><td class="val">1.0</td></tr>
+              <tr><th>Precision</th><td class="val">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td><td class="val col-hi">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td></tr>
+              <tr><th>torch.compile</th><td class="val">no (baseline)</td><td class="val">yes (1.96&times;)</td><td class="val col-hi">yes (1.96&times;)</td><td class="val">yes</td></tr>
+              <tr><th>Throughput</th><td class="val">~14.6k tok/s</td><td class="val">~60k tok/s</td><td class="val col-hi">~57k tok/s</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>Wall clock</th><td class="val">~24&ndash;48 h</td><td class="val">~4.6 h</td><td class="val col-hi">~4.8 h</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>Seed</th><td class="val">7132026</td><td class="val">7132026</td><td class="val col-hi">7132026</td><td class="val">7132026</td></tr>
+              <tr><th>Hardware</th><td class="val">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td><td class="val col-hi">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td></tr>
+
+              <tr class="grp"><td colspan="5">Corpus</td></tr>
+              <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">~0.006%</td><td class="val col-hi">25.0%</td><td class="tbd">25% (target)</td></tr>
+              <tr><th>Christian tokens</th><td class="val">5.6M</td><td class="val">5.6M</td><td class="val col-hi">250M (240M raw + 10M chat)</td><td class="tbd">TBD</td></tr>
+              <tr><th>Christian epochs</th><td class="val">&lt;1</td><td class="val">&lt;1</td><td class="val col-hi">1.92 (of 125M unique)</td><td class="tbd">&le;2</td></tr>
+              <tr><th>Chat-format (Template V1)</th><td class="val">none</td><td class="val">none</td><td class="val col-hi">10M (1%)</td><td class="val">1% (planned)</td></tr>
+              <tr><th>General tokens</th><td class="val">~2.5B</td><td class="val">~1.0B</td><td class="val col-hi">750M (75%)</td><td class="tbd">TBD</td></tr>
+              <tr><th>Chat template</th><td class="val">none</td><td class="val">none</td><td class="val col-hi">Celia Template V1</td><td class="val">Celia Template V1</td></tr>
+              <tr><th>Decoding default</th><td class="val">greedy</td><td class="val">greedy</td><td class="val col-hi">temp 0.5, top-p 0.9, rep 1.15</td><td class="val">temp 0.5</td></tr>
+
+              <tr class="grp"><td colspan="5">Results</td></tr>
+              <tr><th>Pretrain final loss</th><td class="val">2.819</td><td class="val">3.586</td><td class="val col-hi">7.14 &rarr; (step 70, running)</td><td class="tbd">pending</td></tr>
+              <tr><th>SFT eval loss (start &rarr; end)</th><td class="val">4.31 &rarr; 2.24</td><td class="val">4.68 &rarr; 2.57</td><td class="val col-hi">&mdash;</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>CSMB scripture (SFT)</th><td class="val">14.73</td><td class="val">6.13</td><td class="val col-hi">pending</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>COGB overall (SFT)</th><td class="val">0.0</td><td class="val">0.0</td><td class="val col-hi">pending</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>Generation verdict</th><td class="val">degenerate (loops / multilingual)</td><td class="val">degenerate (same failure)</td><td class="val col-hi">pending</td><td class="tbd">&mdash;</td></tr>
+            </tbody>
+          </table>
         </div>
+        <p class="reg-foot-note">Highlighted column = the model training right now. Base-model gauntlet scores floor at ~0 for all rows (untuned generation); the SFT figures above are the meaningful comparison. C0.1 &amp; Mini-C0.1 both trained on a broad, ~0%-Christian corpus with no chat template &mdash; the diagnostic finding that motivated the C0.2 recipe (data concentration + Template V1) that Mini-C0.2 now probes.</p>
+      </section>
 
-        <div class="shift-demo" data-shift-demo>
-          <div class="shift-question">
-            <span class="shift-eyebrow">Everyday question</span>
-            <p data-shift-question></p>
-          </div>
+      <!-- ============ MODEL CARDS ============ -->
+      <section class="reg-panel" data-panel="cards">
+        <div class="cards">
 
-          <div class="shift-grid">
-            <article class="shift-col shift-col--base">
-              <header class="shift-col-head">
-                <span class="shift-who">Base model</span>
-                <span class="shift-tech">comma-v0.1-2t</span>
-              </header>
-              <p class="shift-answer" data-shift-base></p>
-              <div class="shift-score">
-                <span class="shift-score-num" data-shift-base-score>0</span>
-                <span class="shift-score-den">/&nbsp;1</span>
-              </div>
-            </article>
+          <article class="card">
+            <h3>Celia-C0.1 <span class="badge badge--fail">not serviceable</span></h3>
+            <p class="sub">125M &middot; main series &middot; first from-scratch Celia model</p>
+            <h4>Architecture</h4>
+            <table class="kv"><tbody>
+              <tr><td>Parameters</td><td>125,077,824 (tied; 144M untied in HF)</td></tr>
+              <tr><td>Shape</td><td>hidden 576 &times; 30 layers</td></tr>
+              <tr><td>Attention</td><td>9 heads / 3 KV (GQA), head_dim 64</td></tr>
+              <tr><td>MLP / act</td><td>1536, SwiGLU</td></tr>
+              <tr><td>Norm / pos</td><td>RMSNorm 1e-6 / RoPE &theta;=10000</td></tr>
+              <tr><td>Vocab / ctx</td><td>32,768 / 2048</td></tr>
+            </tbody></table>
+            <h4>Training</h4>
+            <table class="kv"><tbody>
+              <tr><td>Tokens</td><td>2,501,509,120 (~20:1)</td></tr>
+              <tr><td>Batch / seq</td><td>32 / 2048</td></tr>
+              <tr><td>LR</td><td>3e-4 &rarr; 3e-5 cosine, 1% warmup</td></tr>
+              <tr><td>Optim</td><td>AdamW(0.9,0.95), wd 0.1, clip 1.0</td></tr>
+              <tr><td>Compile</td><td>no (baseline) &middot; ~14.6k tok/s</td></tr>
+              <tr><td>Pretrain loss</td><td>2.819</td></tr>
+            </tbody></table>
+            <h4>Corpus &amp; results</h4>
+            <table class="kv"><tbody>
+              <tr><td>Corpus</td><td>common-pile-balanced 100B pool</td></tr>
+              <tr><td>Christian</td><td>~0.006% (5.6M), no template</td></tr>
+              <tr><td>SFT</td><td>Celia-SFT-V2.0; eval 4.31&rarr;2.24</td></tr>
+              <tr><td>CSMB / COGB</td><td>14.73 / 0.0</td></tr>
+            </tbody></table>
+            <p class="note">Eval loss fell beautifully, but generation collapsed &mdash; multilingual gibberish on simple prompts and template loops. Diagnostic: the near-total absence of Christian text + no baked-in conversational format.</p>
+          </article>
 
-            <div class="shift-delta" aria-hidden="true">
-              <span class="shift-delta-arrow">&rarr;</span>
-              <span class="shift-delta-val" data-shift-delta>+1</span>
-            </div>
+          <article class="card">
+            <h3>Celia-Mini-C0.1 <span class="badge badge--fail">not serviceable</span></h3>
+            <p class="sub">50M &middot; Mini-C series &middot; probes the C0.1 recipe at reduced scale</p>
+            <h4>Architecture</h4>
+            <table class="kv"><tbody>
+              <tr><td>Parameters</td><td>50,016,768</td></tr>
+              <tr><td>Shape</td><td>hidden 512 &times; 12 layers</td></tr>
+              <tr><td>Attention</td><td>8 heads / 2 KV (GQA), head_dim 64</td></tr>
+              <tr><td>MLP / act</td><td>1376, SwiGLU</td></tr>
+              <tr><td>Norm / pos</td><td>RMSNorm 1e-6 / RoPE &theta;=10000</td></tr>
+              <tr><td>Vocab / ctx</td><td>32,768 / 2048</td></tr>
+            </tbody></table>
+            <h4>Training</h4>
+            <table class="kv"><tbody>
+              <tr><td>Tokens</td><td>1,000,275,968 (~20:1)</td></tr>
+              <tr><td>Batch / seq</td><td>64 / 2048</td></tr>
+              <tr><td>LR</td><td>3e-4 &rarr; 3e-5 cosine, 1% warmup</td></tr>
+              <tr><td>Optim</td><td>AdamW(0.9,0.95), wd 0.1, clip 1.0</td></tr>
+              <tr><td>Compile</td><td>yes (1.96&times;) &middot; ~60k tok/s &middot; ~4.6 h</td></tr>
+              <tr><td>Pretrain loss</td><td>3.586</td></tr>
+            </tbody></table>
+            <h4>Corpus &amp; results</h4>
+            <table class="kv"><tbody>
+              <tr><td>Corpus</td><td>same broad pool as C0.1</td></tr>
+              <tr><td>Christian</td><td>~0.006%, no template</td></tr>
+              <tr><td>SFT</td><td>eval 4.68&rarr;2.57</td></tr>
+              <tr><td>CSMB / COGB</td><td>6.13 / 0.0</td></tr>
+            </tbody></table>
+            <p class="note">Reproduced C0.1&rsquo;s failure at 50M &mdash; confirming the degeneration is scale-independent and rooted in data/format, not model size. This established the controlled baseline that Mini-C0.2 is built to beat.</p>
+          </article>
 
-            <article class="shift-col shift-col--celia">
-              <header class="shift-col-head">
-                <span class="shift-who">Celia</span>
-                <span class="shift-tech">selected Celia checkpoint</span>
-              </header>
-              <p class="shift-answer" data-shift-celia></p>
-              <div class="shift-score">
-                <span class="shift-score-num" data-shift-celia-score>1</span>
-                <span class="shift-score-den">/&nbsp;1</span>
-              </div>
-            </article>
-          </div>
+          <article class="card" style="border-color: rgba(0,163,255,.4); box-shadow: 0 10px 30px rgba(0,163,255,.08);">
+            <h3>Celia-Mini-C0.2 <span class="badge badge--training">training</span></h3>
+            <p class="sub">50M &middot; Mini-C series &middot; probes the C0.2 recipe (concentration + Template V1)</p>
+            <h4>Architecture</h4>
+            <table class="kv"><tbody>
+              <tr><td>Parameters</td><td>50,018,304</td></tr>
+              <tr><td>Shape</td><td>hidden 512 &times; 12 layers</td></tr>
+              <tr><td>Attention</td><td>8 heads / 2 KV (GQA), head_dim 64</td></tr>
+              <tr><td>MLP / act</td><td>1376, SwiGLU</td></tr>
+              <tr><td>Vocab / ctx</td><td>32,771 (+3 role tokens) / 2048</td></tr>
+            </tbody></table>
+            <h4>Training</h4>
+            <table class="kv"><tbody>
+              <tr><td>Tokens</td><td>994,996,224 (~20:1)</td></tr>
+              <tr><td>Batch / seq</td><td>64 / 2048</td></tr>
+              <tr><td>LR</td><td>3e-4 &rarr; 3e-5 cosine, 1% warmup</td></tr>
+              <tr><td>Compile</td><td>yes &middot; ~57k tok/s &middot; ~4.8 h</td></tr>
+              <tr><td>Pretrain loss</td><td>10.58 &rarr; 7.14 (step 70, running)</td></tr>
+            </tbody></table>
+            <h4>Corpus &amp; template</h4>
+            <table class="kv"><tbody>
+              <tr><td>Christian</td><td>25.0% &mdash; 240M raw (1.92 epochs of 125M unique) + 10M chat</td></tr>
+              <tr><td>General</td><td>750M (75%)</td></tr>
+              <tr><td>Template</td><td>Celia Template V1 (1% infused)</td></tr>
+              <tr><td>Roles / stop</td><td>&lt;|system|&gt;/&lt;|user|&gt;/&lt;|assistant|&gt; &middot; &lt;eos&gt;</td></tr>
+              <tr><td>Decoding</td><td>temp 0.5, top-p 0.9, rep 1.15</td></tr>
+              <tr><td>Results</td><td>pending (~4.8 h run)</td></tr>
+            </tbody></table>
+            <p class="note">The live experiment: does concentrating the corpus (0% &rarr; 25% Christian) and baking Template V1 into pretraining fix the coherence that C0.1 and Mini-C0.1 lacked? Same 50M scale, same token budget as Mini-C0.1 &mdash; a clean controlled test.</p>
+          </article>
 
-          <div class="shift-foot">
-            <div class="shift-controls">
-              <button class="shift-nav" type="button" data-shift-prev aria-label="Previous question">&lsaquo;</button>
-              <div class="shift-dots" data-shift-dots></div>
-              <button class="shift-nav" type="button" data-shift-next aria-label="Next question">&rsaquo;</button>
-            </div>
-            <p class="shift-provenance">Theology Test V1.0</p>
-          </div>
+          <article class="card">
+            <h3>Celia-C0.2 <span class="badge badge--planned">planned</span></h3>
+            <p class="sub">main series &middot; the scaled-up target once the Mini probe reports</p>
+            <h4>Projected architecture</h4>
+            <table class="kv"><tbody>
+              <tr><td>Parameters</td><td>TBD &mdash; 125M candidate; &ldquo;overfilled&rdquo; toward 40:1 under discussion</td></tr>
+              <tr><td>Family</td><td>Llama-style (RMSNorm, RoPE, GQA, SwiGLU)</td></tr>
+              <tr><td>Vocab / ctx</td><td>32,771 / 2048</td></tr>
+              <tr><td>Template</td><td>Celia Template V1 (baked in)</td></tr>
+            </tbody></table>
+            <h4>Projected corpus</h4>
+            <table class="kv"><tbody>
+              <tr><td>Tokens</td><td>~2.5B (20:1) to ~5B (40:1), TBD</td></tr>
+              <tr><td>Christian</td><td>25% target; ~134M unique harvested (&le;2 epochs &rarr; up to 268M)</td></tr>
+              <tr><td>Chat</td><td>1% Template-V1 (Grok-distilled)</td></tr>
+            </tbody></table>
+            <p class="note">Open decision: with Christian capped at ~268M (&le;2 epochs), a true 25% Christian and a 125M param count trade off against each other. Final size and ratio wait on the Mini-C0.2 result.</p>
+          </article>
+
         </div>
       </section>
 
-      <section class="site-shell leap-section reveal">
-        <div class="essay">
-          <p>V1.5.0-r2-combined is the best judge we have built so far, and around 70% of its training pairs were synthetically created and added through <a class="gloss-link" href="#g-autogen">AutoGen</a>. It belongs to the Gemma adapter line, which is currently our strongest evaluator and quality gate. The separate Comma Alpha line is where we are testing owned-model training: promising for licensing and long-term formation, but still far weaker today and not yet ready to replace the Gemma judge.</p>
-          <p>That split is important. Gemma V1.5.0-r2-combined grades incoming data and aced both <a class="gloss-link" href="#g-dev">Dev V1.2</a> and <a class="gloss-link" href="#g-holdout">Holdout V1.2</a>; Comma Alpha exposes what still has to be solved at the model level, especially single-answer formatting and ordinary Christian reasoning.</p>
+      <!-- ============ DELTAS ============ -->
+      <section class="reg-panel" data-panel="deltas">
+
+        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Mini-C0.1 &rarr; Mini-C0.2</h3>
+        <p class="delta-lead">The controlled experiment &mdash; identical 50M scale and ~1B token budget, changing only the recipe.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>Mini-C0.1</th><th>Mini-C0.2</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">25.0%</td><td class="chg chg-key">&plus;25 pts &middot; ~4,000&times;</td></tr>
+            <tr><th>Chat template</th><td class="val">none</td><td class="val">Template V1</td><td class="chg chg-key">introduced</td></tr>
+            <tr><th>Chat-format tokens</th><td class="val">0</td><td class="val">10M (1%)</td><td class="chg chg-up">&plus;10M</td></tr>
+            <tr><th>Vocab</th><td class="val">32,768</td><td class="val">32,771</td><td class="chg">&plus;3 role tokens</td></tr>
+            <tr><th>Decoding default</th><td class="val">greedy</td><td class="val">temp 0.5 + rep 1.15</td><td class="chg chg-key">anti-loop</td></tr>
+            <tr><th>Parameters</th><td class="val">50,016,768</td><td class="val">50,018,304</td><td class="chg">+1,536 (embed)</td></tr>
+            <tr><th>Train tokens</th><td class="val">1.00B</td><td class="val">0.99B</td><td class="chg">~unchanged</td></tr>
+            <tr><th>Pretrain loss</th><td class="val">3.586</td><td class="val">pending</td><td class="chg">&mdash;</td></tr>
+          </tbody></table>
         </div>
-        <div class="leap-stats" aria-label="V1.5.0-r2-combined results">
-          <div class="leap-stat">
-            <strong>80 / 80</strong>
-            <span>A full score on Dev and the sealed Holdout&mdash;no false keeps, no misses.</span>
-          </div>
-          <div class="leap-stat">
-            <strong>1,877</strong>
-            <span>Trusted training pairs, almost all sorted by the judge itself.</span>
-          </div>
-          <div class="leap-stat">
-            <strong>18</strong>
-            <span>Rows we stepped in to cut by hand&mdash;the only curation it still needed.</span>
-          </div>
+
+        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Celia-C0.1 &rarr; Celia-Mini-C0.1</h3>
+        <p class="delta-lead">Scale delta on the same broad recipe &mdash; how the diagnostic failure carries down from 125M to 50M.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>C0.1</th><th>Mini-C0.1</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Parameters</th><td class="val">125,077,824</td><td class="val">50,016,768</td><td class="chg">&minus;60%</td></tr>
+            <tr><th>Shape</th><td class="val">576 &times; 30</td><td class="val">512 &times; 12</td><td class="chg">narrower, shallower</td></tr>
+            <tr><th>Train tokens</th><td class="val">2.50B</td><td class="val">1.00B</td><td class="chg">&minus;60%</td></tr>
+            <tr><th>Batch</th><td class="val">32</td><td class="val">64</td><td class="chg">&times;2</td></tr>
+            <tr><th>Compile</th><td class="val">no</td><td class="val">yes (1.96&times;)</td><td class="chg chg-up">added</td></tr>
+            <tr><th>Pretrain loss</th><td class="val">2.819</td><td class="val">3.586</td><td class="chg">&plus;0.767</td></tr>
+            <tr><th>SFT CSMB scripture</th><td class="val">14.73</td><td class="val">6.13</td><td class="chg">&minus;8.60</td></tr>
+            <tr><th>Generation</th><td class="val">degenerate</td><td class="val">degenerate</td><td class="chg">same failure</td></tr>
+          </tbody></table>
+        </div>
+
+        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Celia-C0.1 &rarr; Celia-C0.2 <span class="badge badge--planned">projected</span></h3>
+        <p class="delta-lead">The main-series jump the whole effort is building toward.</p>
+        <div class="tbl-scroll">
+          <table class="reg delta"><thead><tr><th>Category</th><th>C0.1</th><th>C0.2 (planned)</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">25% (target)</td><td class="chg chg-key">&plus;25 pts</td></tr>
+            <tr><th>Chat template</th><td class="val">none</td><td class="val">Template V1</td><td class="chg chg-key">introduced</td></tr>
+            <tr><th>Parameters</th><td class="val">125M</td><td class="tbd">TBD</td><td class="chg">open decision</td></tr>
+            <tr><th>Train tokens</th><td class="val">2.5B</td><td class="tbd">2.5B&ndash;5B</td><td class="chg">up to &times;2</td></tr>
+            <tr><th>Vocab</th><td class="val">32,768</td><td class="val">32,771</td><td class="chg">&plus;3 roles</td></tr>
+            <tr><th>Decoding</th><td class="val">greedy</td><td class="val">temp 0.5</td><td class="chg chg-key">anti-loop</td></tr>
+          </tbody></table>
         </div>
       </section>
 
-      <section class="site-shell section reveal">
-        <div class="section-heading">
-          <h2>Glossary</h2>
-        </div>
-        <dl class="glossary-list">
-          <div class="glossary-row" id="g-dev">
-            <dt>Dev V1.2</dt>
-            <dd>A fixed set of forty graded examples used while tuning a judge. The judge is allowed to learn against these, so a strong Dev score alone does not prove much.</dd>
-          </div>
-          <div class="glossary-row" id="g-holdout">
-            <dt>Holdout V1.2</dt>
-            <dd>A second fixed set of forty graded examples kept sealed during training. Because the judge never sees it while learning, the Holdout score is the better evidence that it generalizes.</dd>
-          </div>
-          <div class="glossary-row" id="g-autogen">
-            <dt>AutoGen (AG)</dt>
-            <dd>Machine-generated candidate responses, each screened by the current judge and confirmed by a human before any enter training. AG1 through AG10 built the current Gemma capstone; later AG sets are now part of the Comma/owned-model experiments.</dd>
-          </div>
-        </dl>
-      </section>
+      <p class="reg-foot-note">Sources: run configs (<code>run_config.json</code>), materialization manifests, and gauntlet summaries (CSMB / CAIB / COGB). Base-model generation scores floor at ~0 across the board; SFT figures are the meaningful line. This registry is a research artifact and updates as models complete.</p>
     </main>
 
     <footer class="footer">
@@ -145,24 +331,29 @@
           <a class="footer-mark" href="index.html"><img src="assets/images/celia-logo-transparent-v2.png" alt="The Celia Project"></a>
           <p>A Christian AI assistant for the ordinary work of a day&mdash;drafting, thinking, deciding, getting unstuck&mdash;grounded in Scripture and built to stay faithful to it. The model does the work; the judge keeps its voice honest.</p>
         </div>
-        <nav class="footer-nav" aria-label="Footer navigation">
-          <span class="footer-heading">Explore</span>
-          <a href="index.html">Landing</a>
-          <a href="mission.html">Mission</a>
-          <a href="judges.html">Judge Models</a>
-          <a href="roadmap.html">News</a>
-          <a href="contact.html">Contact</a>
-        </nav>
       </div>
       <div class="site-shell footer-verse">
         <blockquote>So neither the one who plants nor the one who waters is anything, but only God, who makes things grow. The one who plants and the one who waters have one purpose, and they will each be rewarded according to their own labor. For we are co-workers in God&rsquo;s service; you are God&rsquo;s field, God&rsquo;s building.</blockquote>
         <cite class="verse-ref">1 Corinthians 3:7&ndash;9 &middot; NIV</cite>
       </div>
       <div class="site-shell footer-base">
-        <span>The Celia Project — research prototype</span>
+        <span>The Celia Project &mdash; research prototype</span>
         <span>Careful voice. Human curation. Christian judgment.</span>
       </div>
     </footer>
+
+    <script>
+      (function () {
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('.reg-tab'));
+        var panels = Array.prototype.slice.call(document.querySelectorAll('.reg-panel'));
+        tabs.forEach(function (t) {
+          t.addEventListener('click', function () {
+            tabs.forEach(function (x) { x.setAttribute('aria-selected', x === t ? 'true' : 'false'); });
+            panels.forEach(function (p) { p.setAttribute('data-active', p.getAttribute('data-panel') === t.getAttribute('data-tab') ? 'true' : 'false'); });
+          });
+        });
+      })();
+    </script>
     <script src="assets/js/site.js?v=7.0"></script>
   </body>
 </html>
