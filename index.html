@@ -74,13 +74,14 @@
           <span><span class="badge badge--planned">planned</span> projected specs, in design</span>
           <span><span class="badge badge--fail">not serviceable</span> completed but degenerate (diagnostic)</span>
         </div>
-        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-18 &middot; new: Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
+        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-18 &middot; new: Research lab tab &mdash; Architecture Lab round 1 complete (hybrid attention+SSM wins: eval 5.5343 vs transformer 5.7311 at ~50M) &middot; token-to-parameter ratio study 0.5M leg running &middot; Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
       </section>
 
       <div class="reg-tabs" role="tablist">
         <button class="reg-tab" role="tab" aria-selected="true" data-tab="overview">Overview matrix</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="cards">Model cards</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="finetuned">Fine-tuned models</button>
+        <button class="reg-tab" role="tab" aria-selected="false" data-tab="lab">Research lab</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="deltas">Deltas</button>
       </div>
 
@@ -367,6 +368,59 @@
               <tr><td>Policy</td><td>2026-07-17_v2: LLM-authored rows only, zero script-generated</td></tr>
             </tbody></table>
             <p class="note">Launch findings: Gemma 4 requires final-logit softcapping (30.0); its multimodal wrapper demands mm_token_type_ids in training (bypassed via the text decoder); labels must be causally shifted against packed blocks. First eager run measured 120 tok/s (&asymp;29 TFLOP/s vs the GB10&rsquo;s 94 TFLOP/s measured bf16 matmul rate) &mdash; restarted with the compile + strided-checkpoint kit above.</p>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ============ RESEARCH LAB ============ -->
+      <section class="reg-panel" data-panel="lab">
+        <p class="sub" style="margin:8px 0 14px;">Experiments that guide the project &mdash; custom architectures and dataset science. Findings here feed the next from-scratch Celia generation; nothing in this tab is a served model.</p>
+        <div class="cards">
+
+          <article class="card">
+            <h3>Architecture Lab &mdash; Round 1 <span class="badge badge--done">complete</span></h3>
+            <p class="sub">Transformer vs pure Mamba-2 vs hybrid &middot; controlled comparison at ~50M params &middot; 2026-07-18</p>
+            <h4>Setup</h4>
+            <table class="kv"><tbody>
+              <tr><td>Question</td><td>Does a state-space model (fixed-size running state instead of attention&rsquo;s look-back-at-everything) hold language-modeling quality at our scale &mdash; and does sprinkling a few attention layers into a Mamba stack beat both?</td></tr>
+              <tr><td>Legs</td><td>transformer: 12&times;(attention+MLP) &middot; mamba: 20 Mamba-2 blocks &middot; hybrid: 19 blocks with attention at positions 4/10/16</td></tr>
+              <tr><td>Held equal</td><td>~50M params (&plusmn;3%), same corpus &amp; 32K vocab, same optimizer/schedule, 30M tokens each, seq 2048</td></tr>
+              <tr><td>Kernel</td><td>Mamba-2 chunked state-space dual form, pure PyTorch (segsum + einsums, 64-token chunks); verified against a token-by-token sequential recurrence to 6e-14 max error in fp64</td></tr>
+            </tbody></table>
+            <h4>Results</h4>
+            <div class="tbl-scroll">
+            <table class="kv"><tbody>
+              <tr><td></td><td><strong>transformer</strong> &middot; <strong>mamba-2</strong> &middot; <strong>hybrid</strong></td></tr>
+              <tr><td>Params</td><td class="val">50,018,304 &middot; 49,857,984 &middot; 51,552,000</td></tr>
+              <tr><td>Eval loss</td><td class="val">5.7311 &middot; 5.6177 &middot; <strong>5.5343</strong></td></tr>
+              <tr><td>Loss @ pos 0&ndash;255</td><td class="val">5.7922 &middot; 5.6436 &middot; 5.5663</td></tr>
+              <tr><td>Loss @ pos 256&ndash;1023</td><td class="val">5.7178 &middot; 5.6090 &middot; 5.5245</td></tr>
+              <tr><td>Loss @ pos 1024&ndash;2047</td><td class="val">5.7258 &middot; 5.6178 &middot; 5.5337</td></tr>
+              <tr><td>Train tok/s</td><td class="val">30,439 &middot; 11,825 &middot; 13,285</td></tr>
+              <tr><td>Peak GiB</td><td class="val">49.9 &middot; 92.4 &middot; 85.0</td></tr>
+            </tbody></table>
+            </div>
+            <p class="note">Hybrid wins every loss bucket &mdash; best overall eval 5.5343 vs 5.7311 for the transformer, with quality flat across context depth for all three. Throughput caveat: the SSM legs run hand-written einsum kernels against the transformer&rsquo;s fused attention kernel, so the tok/s and memory gap is implementation, not architecture (production Mamba kernels close it). Hybrid also carries +3% params. Round 2 candidates: how few attention layers suffice, sliding-window variants, and a needle test (plant a fact early, query it late) to measure exact recall directly.</p>
+          </article>
+
+          <article class="card">
+            <h3>Token-to-parameter ratio study &mdash; 0.5M leg <span class="badge">running</span></h3>
+            <p class="sub">How much data is a parameter worth? Training ratios 1:1 &rarr; 50,000:1 &middot; started 2026-07-18</p>
+            <h4>Design</h4>
+            <table class="kv"><tbody>
+              <tr><td>Model</td><td>d=128 &middot; 3 layers &middot; 4 heads &middot; SwiGLU &middot; RMSNorm &middot; RoPE &middot; tied embeddings &middot; 593,792 non-embedding params</td></tr>
+              <tr><td>Vocab</td><td>fresh 4,096-token BPE (a 32K embedding table would dwarf a 0.5M network; small vocab keeps the ratio measuring the network, not the vocabulary)</td></tr>
+              <tr><td>Schedule</td><td>flat LR 1e-3 after 200-step warmup &mdash; flat so any point can be branched: copied off and given a short LR cool-down, yielding a finished-model measurement at that ratio</td></tr>
+              <tr><td>Measurement</td><td>smoothed train loss at every integer ratio &middot; ~228 log-spaced held-out evals &middot; 12 branch checkpoints (ratios 20&hellip;50,000)</td></tr>
+              <tr><td>Budget</td><td>29.7B tokens = 453,027 steps of 32&times;2048 &middot; corpus is 1.28B unique tokens, so the far end revisits data ~23&times; &mdash; doubling as the data-repetition study</td></tr>
+              <tr><td>Precision</td><td>fp32 master weights, bf16 compute, compiled train step (MLX, Apple M5) &middot; ~40&ndash;48K tok/s, &asymp;7 days projected</td></tr>
+            </tbody></table>
+            <h4>Live curve (held-out eval loss)</h4>
+            <table class="kv"><tbody>
+              <tr><td>Ratio 20 / 50 / 100 / 200</td><td class="val">5.8883 / 4.8704 / 4.4939 / 4.2369</td></tr>
+            </tbody></table>
+            <p class="note">Goal: find where loss stops paying for more data at fixed size &mdash; the &ldquo;best model for its size&rdquo; frontier &mdash; and extrapolate the trend upward with 1M and 2M legs (queued on the DGX Spark behind the Architecture Lab). Compute-optimal is ~20:1 (Chinchilla); small models served long-term want far more, and this measures exactly how far the returns run.</p>
           </article>
 
         </div>
