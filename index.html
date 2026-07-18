@@ -74,12 +74,13 @@
           <span><span class="badge badge--planned">planned</span> projected specs, in design</span>
           <span><span class="badge badge--fail">not serviceable</span> completed but degenerate (diagnostic)</span>
         </div>
-        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-17 &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
+        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-18 &middot; new: Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
       </section>
 
       <div class="reg-tabs" role="tablist">
         <button class="reg-tab" role="tab" aria-selected="true" data-tab="overview">Overview matrix</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="cards">Model cards</button>
+        <button class="reg-tab" role="tab" aria-selected="false" data-tab="finetuned">Fine-tuned models</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="deltas">Deltas</button>
       </div>
 
@@ -305,6 +306,41 @@
               <tr><td>Extras</td><td>dispersion-loss + doc-masking + z-loss (to ablate)</td></tr>
             </tbody></table>
             <p class="note">The recipe is being set by a research review + a small-model ablation bake-off (deep-thin vs wide, WSD vs cosine, dispersion loss, data annealing) &mdash; validate the levers cheaply at 50&ndash;68M, then commit the multi-day run with the winning combination.</p>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ============ FINE-TUNED MODELS ============ -->
+      <section class="reg-panel" data-panel="finetuned">
+        <p class="sub" style="margin:8px 0 14px;">Adapter fine-tunes of open-weight base models &mdash; a separate lineage from the from-scratch C-series. Purpose: a strong Celia prototype now, while the C-series pretraining recipe matures.</p>
+        <div class="cards">
+
+          <article class="card">
+            <h3>Celia-G0.1-31B <span class="badge">spec &mdash; run pending</span></h3>
+            <p class="sub">31B &middot; G-series (Gemma lineage) &middot; first fine-tuned Celia</p>
+            <h4>Base model</h4>
+            <table class="kv"><tbody>
+              <tr><td>Base</td><td>google/gemma-4-31B-it (Apache 2.0, ungated)</td></tr>
+              <tr><td>Shape</td><td>30.7B &middot; 60 layers &middot; hybrid local(1024)/global attention</td></tr>
+              <tr><td>Vocab / ctx</td><td>262,144 / 256K (trained at 2048 packed)</td></tr>
+              <tr><td>Vision tower</td><td>~550M, frozen &amp; unused (text-only SFT)</td></tr>
+            </tbody></table>
+            <h4>SFT recipe (proposed)</h4>
+            <table class="kv"><tbody>
+              <tr><td>Method</td><td>bf16 LoRA r=16 &alpha;=32 drop 0.05, all linear layers</td></tr>
+              <tr><td>LR</td><td>2e-4 &rarr; 2e-5 cosine, 3% warmup</td></tr>
+              <tr><td>Loss</td><td>assistant-tokens only, chunked CE (262K vocab)</td></tr>
+              <tr><td>Batch</td><td>~128K tok effective (packed seq 2048, grad accum)</td></tr>
+              <tr><td>Epochs</td><td>2, checkpoint every &frac12; epoch, early stop on eval</td></tr>
+            </tbody></table>
+            <h4>Data</h4>
+            <table class="kv"><tbody>
+              <tr><td>Dataset</td><td>Celia-SFT-V3.0 &middot; 76,914 train / 4,048 eval</td></tr>
+              <tr><td>Mix</td><td>56K agent-rewrite Christian Q&amp;A + 19.6K charter domains + 5K OASST-Celia + reader</td></tr>
+              <tr><td>Policy</td><td>2026-07-17_v2: LLM-authored rows only, zero script-generated</td></tr>
+            </tbody></table>
+            <p class="note">Rationale: Gemma 4 is ~500:1 overtrained &mdash; general capability the C-series cannot reach yet comes free; SFT teaches the charter voice (behavior), which is exactly what SFT is good at. Hardware: DGX Spark GB10 128GB &mdash; bf16 LoRA fits (~80GiB) with no quantization needed.</p>
           </article>
 
         </div>
