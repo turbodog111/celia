@@ -355,7 +355,7 @@
               <tr><td>Compile</td><td>regional torch.compile per decoder layer (dynamic=False; graphs shared across the 60 identical layers)</td></tr>
               <tr><td>Activation ckpt</td><td>every 2nd layer (30/60) non-reentrant &mdash; half the recompute of blanket checkpointing, ~27 GiB more residency (memory-for-time)</td></tr>
               <tr><td>Misc</td><td>use_cache off &middot; SDPA attention &middot; CUDA expandable segments &middot; pure text decoder called directly (multimodal wrapper bypassed)</td></tr>
-              <tr><td>Measured (eager v1)</td><td>120 tok/s, 78.9 GiB, ~26 h/epoch on V3.0 &mdash; superseded by speed-kit restart; measured numbers updated when the smoke lands</td></tr>
+              <tr><td>Measured</td><td>eager: 120 tok/s, 78.9 GiB &middot; speed kit (compile + 15/60-layer checkpointing, micro-batch 1): <strong>258 tok/s, 107 GiB &mdash; 2.15&times;</strong> &middot; run currently parked; project pivoted to the research lab</td></tr>
             </tbody></table>
             <h4>Data (Celia-SFT-V3.1)</h4>
             <table class="kv"><tbody>
