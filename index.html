@@ -317,30 +317,33 @@
         <div class="cards">
 
           <article class="card">
-            <h3>Celia-G0.1-31B <span class="badge">spec &mdash; run pending</span></h3>
+            <h3>Celia-G0.1-31B <span class="badge">training</span></h3>
             <p class="sub">31B &middot; G-series (Gemma lineage) &middot; first fine-tuned Celia</p>
             <h4>Base model</h4>
             <table class="kv"><tbody>
               <tr><td>Base</td><td>google/gemma-4-31B-it (Apache 2.0, ungated)</td></tr>
-              <tr><td>Shape</td><td>30.7B &middot; 60 layers &middot; hybrid local(1024)/global attention</td></tr>
+              <tr><td>Shape</td><td>30.7B &middot; 60 layers &middot; hidden 5376 &middot; hybrid local(1024)/global attention</td></tr>
               <tr><td>Vocab / ctx</td><td>262,144 / 256K (trained at 2048 packed)</td></tr>
-              <tr><td>Vision tower</td><td>~550M, frozen &amp; unused (text-only SFT)</td></tr>
+              <tr><td>Vision tower</td><td>~550M, frozen &amp; bypassed (pure text decoder called directly)</td></tr>
             </tbody></table>
-            <h4>SFT recipe (proposed)</h4>
+            <h4>SFT recipe (exact, as running)</h4>
             <table class="kv"><tbody>
-              <tr><td>Method</td><td>bf16 LoRA r=16 &alpha;=32 drop 0.05, all linear layers</td></tr>
-              <tr><td>LR</td><td>2e-4 &rarr; 2e-5 cosine, 3% warmup</td></tr>
-              <tr><td>Loss</td><td>assistant-tokens only, chunked CE (262K vocab)</td></tr>
-              <tr><td>Batch</td><td>~128K tok effective (packed seq 2048, grad accum)</td></tr>
-              <tr><td>Epochs</td><td>2, checkpoint every &frac12; epoch, early stop on eval</td></tr>
+              <tr><td>Method</td><td>bf16 LoRA r=16 &alpha;=32 drop 0.05 &middot; q/k/v/o/gate/up/down, all 60 layers &middot; 122.4M trainable (0.39%) &middot; fp32 adapter masters</td></tr>
+              <tr><td>LR / sched</td><td>2e-4 &rarr; 2e-5 cosine, 3% warmup (20 steps), AdamW(0.9,0.999) wd 0, clip 1.0</td></tr>
+              <tr><td>Loss</td><td>assistant-tokens only (causal shift), fused chunked CE w/ logit softcap 30.0, chunk 8192</td></tr>
+              <tr><td>Batch</td><td>micro-batch 2 &times; grad-accum 8 = 16 packed blocks = 32,768 tok/step &middot; 341 steps/epoch</td></tr>
+              <tr><td>Epochs / stop</td><td>2 max (682 steps) &middot; early-stop patience 2 quarter-epoch turns on token-weighted overall eval</td></tr>
+              <tr><td>Memory kit</td><td>gradient checkpointing (non-reentrant) &middot; bf16 autocast &middot; use_cache off &middot; expandable segments &middot; 78.9 GiB peak</td></tr>
+              <tr><td>Measured</td><td>120 tok/s (&asymp;29 TFLOP/s eff, eager) &middot; ~26 h/epoch &middot; seed 7182026</td></tr>
             </tbody></table>
             <h4>Data</h4>
             <table class="kv"><tbody>
-              <tr><td>Dataset</td><td>Celia-SFT-V3.0 &middot; 76,914 train / 4,048 eval</td></tr>
+              <tr><td>Dataset</td><td>Celia-SFT-V3.0 &middot; 76,914 train / 4,048 eval (5% holdout)</td></tr>
+              <tr><td>Rendered</td><td>Gemma chat template + global Celia system prompt &middot; 5,457 packed 2048 blocks &middot; 4.78M assistant tokens</td></tr>
               <tr><td>Mix</td><td>56K agent-rewrite Christian Q&amp;A + 19.6K charter domains + 5K OASST-Celia + reader</td></tr>
               <tr><td>Policy</td><td>2026-07-17_v2: LLM-authored rows only, zero script-generated</td></tr>
             </tbody></table>
-            <p class="note">Rationale: Gemma 4 is ~500:1 overtrained &mdash; general capability the C-series cannot reach yet comes free; SFT teaches the charter voice (behavior), which is exactly what SFT is good at. Hardware: DGX Spark GB10 128GB &mdash; bf16 LoRA fits (~80GiB) with no quantization needed.</p>
+            <p class="note">Launch findings: Gemma 4 requires final-logit softcapping (30.0) and the multimodal wrapper demands mm_token_type_ids in training &mdash; bypassed via the text decoder. Throughput is eager-mode; regional torch.compile and lighter checkpointing are the identified levers (own 50M baseline: compile = 2.0&times;).</p>
           </article>
 
         </div>
