@@ -326,24 +326,47 @@
               <tr><td>Vocab / ctx</td><td>262,144 / 256K (trained at 2048 packed)</td></tr>
               <tr><td>Vision tower</td><td>~550M, frozen &amp; bypassed (pure text decoder called directly)</td></tr>
             </tbody></table>
-            <h4>SFT recipe (exact, as running)</h4>
+            <h4>LoRA adapter</h4>
             <table class="kv"><tbody>
-              <tr><td>Method</td><td>bf16 LoRA r=16 &alpha;=32 drop 0.05 &middot; q/k/v/o/gate/up/down, all 60 layers &middot; 122.4M trainable (0.39%) &middot; fp32 adapter masters</td></tr>
-              <tr><td>LR / sched</td><td>2e-4 &rarr; 2e-5 cosine, 3% warmup (20 steps), AdamW(0.9,0.999) wd 0, clip 1.0</td></tr>
-              <tr><td>Loss</td><td>assistant-tokens only (causal shift), fused chunked CE w/ logit softcap 30.0, chunk 8192</td></tr>
-              <tr><td>Batch</td><td>micro-batch 2 &times; grad-accum 8 = 16 packed blocks = 32,768 tok/step &middot; 341 steps/epoch</td></tr>
-              <tr><td>Epochs / stop</td><td>2 max (682 steps) &middot; early-stop patience 2 quarter-epoch turns on token-weighted overall eval</td></tr>
-              <tr><td>Memory kit</td><td>gradient checkpointing (non-reentrant) &middot; bf16 autocast &middot; use_cache off &middot; expandable segments &middot; 78.9 GiB peak</td></tr>
-              <tr><td>Measured</td><td>120 tok/s (&asymp;29 TFLOP/s eff, eager) &middot; ~26 h/epoch &middot; seed 7182026</td></tr>
+              <tr><td>Rank / &alpha; / scale</td><td>r=16, &alpha;=32 (scale 2.0), dropout 0.05, bias none</td></tr>
+              <tr><td>Targets</td><td>q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj, down_proj &mdash; all 60 layers</td></tr>
+              <tr><td>Excluded</td><td>vision tower, embeddings, lm_head (tied) &mdash; all frozen bf16</td></tr>
+              <tr><td>Trainable</td><td>122,429,440 params (0.390%) &middot; fp32 adapter masters over bf16 base</td></tr>
             </tbody></table>
-            <h4>Data</h4>
+            <h4>Optimizer &amp; schedule</h4>
             <table class="kv"><tbody>
-              <tr><td>Dataset</td><td>Celia-SFT-V3.0 &middot; 76,914 train / 4,048 eval (5% holdout)</td></tr>
-              <tr><td>Rendered</td><td>Gemma chat template + global Celia system prompt &middot; 5,457 packed 2048 blocks &middot; 4.78M assistant tokens</td></tr>
-              <tr><td>Mix</td><td>56K agent-rewrite Christian Q&amp;A + 19.6K charter domains + 5K OASST-Celia + reader</td></tr>
+              <tr><td>Optimizer</td><td>AdamW fused &middot; &beta;=(0.9, 0.999) &middot; eps 1e-8 &middot; weight decay 0 &middot; grad clip 1.0</td></tr>
+              <tr><td>LR</td><td>2e-4 peak &rarr; 2e-5 floor, cosine &middot; warmup 3% of total steps</td></tr>
+              <tr><td>Batch</td><td>micro-batch 2 &times; grad-accum 8 = 16 blocks = 32,768 tok/step (&asymp;225 conversations)</td></tr>
+              <tr><td>Steps</td><td>416/epoch &middot; 832 max (2 epochs) &middot; seed 7182026, fixed shuffle</td></tr>
+              <tr><td>Early stop</td><td>token-weighted overall eval each &frac14;-epoch turn; stop after 2 turns without &ge;1e-4 improvement; best checkpoint recorded</td></tr>
+              <tr><td>Checkpoints</td><td>adapter-only (~470 MB) every &frac14; epoch + at stop</td></tr>
+            </tbody></table>
+            <h4>Loss</h4>
+            <table class="kv"><tbody>
+              <tr><td>Objective</td><td>next-token CE on assistant tokens only (labels causally shifted; prompts, system, user turns, padding = ignore_index &minus;100)</td></tr>
+              <tr><td>Kernel</td><td>fused chunked linear+CE (chunk 8192) &mdash; full [tok &times; 262K] logits never materialized; recomputed in backward</td></tr>
+              <tr><td>Softcap</td><td>logits = 30&middot;tanh(z/30) (Gemma 4 final_logit_softcapping) in forward and matching backward; softmax/CE in fp32</td></tr>
+              <tr><td>Reduction</td><td>sum / n_valid_assistant_tokens</td></tr>
+            </tbody></table>
+            <h4>Speed &amp; memory kit</h4>
+            <table class="kv"><tbody>
+              <tr><td>Precision</td><td>bf16 frozen weights &middot; bf16 autocast compute &middot; fp32 adapter masters + optimizer state</td></tr>
+              <tr><td>Compile</td><td>regional torch.compile per decoder layer (dynamic=False; graphs shared across the 60 identical layers)</td></tr>
+              <tr><td>Activation ckpt</td><td>every 2nd layer (30/60) non-reentrant &mdash; half the recompute of blanket checkpointing, ~27 GiB more residency (memory-for-time)</td></tr>
+              <tr><td>Misc</td><td>use_cache off &middot; SDPA attention &middot; CUDA expandable segments &middot; pure text decoder called directly (multimodal wrapper bypassed)</td></tr>
+              <tr><td>Measured (eager v1)</td><td>120 tok/s, 78.9 GiB, ~26 h/epoch on V3.0 &mdash; superseded by speed-kit restart; measured numbers updated when the smoke lands</td></tr>
+            </tbody></table>
+            <h4>Data (Celia-SFT-V3.1)</h4>
+            <table class="kv"><tbody>
+              <tr><td>Packet</td><td>102,114 rows &middot; 97,009 train / 5,105 eval (5% holdout)</td></tr>
+              <tr><td>Mix</td><td>77,385 agent-rewrite Christian Q&amp;A (full 10.03M-token set, TARGET_MET) &middot; 19,637 charter domains &middot; 4,996 OASST-Celia &middot; 96 scripture reader</td></tr>
+              <tr><td>Template</td><td>Gemma chat template &middot; one global Celia system prompt (&ldquo;Biblically grounded, non-denominational Protestant assistant&hellip;&rdquo;) &middot; think-channel off</td></tr>
+              <tr><td>Rendering</td><td>assistant spans located by incremental prefix tokenization; greedy-packed into 6,668 &times; 2048-token blocks; 5.75M assistant-loss tokens; 3 over-length rows dropped</td></tr>
+              <tr><td>Eval bins</td><td>per-source: rewrite 245 blocks / charter 75 / OASST 32 / reader 1 + token-weighted overall</td></tr>
               <tr><td>Policy</td><td>2026-07-17_v2: LLM-authored rows only, zero script-generated</td></tr>
             </tbody></table>
-            <p class="note">Launch findings: Gemma 4 requires final-logit softcapping (30.0) and the multimodal wrapper demands mm_token_type_ids in training &mdash; bypassed via the text decoder. Throughput is eager-mode; regional torch.compile and lighter checkpointing are the identified levers (own 50M baseline: compile = 2.0&times;).</p>
+            <p class="note">Launch findings: Gemma 4 requires final-logit softcapping (30.0); its multimodal wrapper demands mm_token_type_ids in training (bypassed via the text decoder); labels must be causally shifted against packed blocks. First eager run measured 120 tok/s (&asymp;29 TFLOP/s vs the GB10&rsquo;s 94 TFLOP/s measured bf16 matmul rate) &mdash; restarted with the compile + strided-checkpoint kit above.</p>
           </article>
 
         </div>
