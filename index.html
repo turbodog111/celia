@@ -74,15 +74,15 @@
           <span><span class="badge badge--planned">planned</span> projected specs, in design</span>
           <span><span class="badge badge--fail">not serviceable</span> completed but degenerate (diagnostic)</span>
         </div>
-        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-19 &middot; new: ratio study 1M leg complete &mdash; the worth-it knee moved DOWN ~4&times; with 2&times; params (3,981:1 &rarr; ~1,039:1; exponent 0.245 &rarr; 0.662), so bigger models want fewer tokens per parameter &middot; Celia-H0.1 (25.8M attention+SSM hybrid, 40:1) trained overnight, gauntlet pending &middot; previously: ratio study 0.5M leg complete &mdash; worth-it optimum ~3,000&ndash;5,000 tok/param (&lambda;=1% best: 3,981:1 @ loss 3.3788); Architecture Lab round 1 complete (hybrid attention+SSM wins: eval 5.5343 vs transformer 5.7311 at ~50M) &middot; Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
+        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-19 &middot; new: <strong>Benchmarks tab</strong> unifying all six trained models on CSMB/CAIB/COGB &middot; <strong>Celia-G0.1-31B complete</strong> (Gemma-4-31B-it + LoRA on Celia-SFT-V3.1; train eval 1.036, COGB 0.913 in the B0.3 band, CSMB/CAIB re-running) &middot; <strong>Celia-H0.1 gauntlet done</strong> &mdash; the half-size hybrid (25.8M @ 40:1) scored CSMB 12.4 vs Mini-C0.2&rsquo;s 24.0, so at this scale size beat the architecture+ratio change &middot; deltas folded inline under the overview matrix &middot; earlier: ratio study 1M leg &mdash; the worth-it knee moved DOWN ~4&times; with 2&times; params (3,981:1 &rarr; ~1,039:1) &middot; ratio study 0.5M leg complete &mdash; worth-it optimum ~3,000&ndash;5,000 tok/param (&lambda;=1% best: 3,981:1 @ loss 3.3788); Architecture Lab round 1 complete (hybrid attention+SSM wins: eval 5.5343 vs transformer 5.7311 at ~50M) &middot; Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
       </section>
 
       <div class="reg-tabs" role="tablist">
         <button class="reg-tab" role="tab" aria-selected="true" data-tab="overview">Overview matrix</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="cards">Model cards</button>
+        <button class="reg-tab" role="tab" aria-selected="false" data-tab="benchmarks">Benchmarks</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="finetuned">Fine-tuned models</button>
         <button class="reg-tab" role="tab" aria-selected="false" data-tab="lab">Research lab</button>
-        <button class="reg-tab" role="tab" aria-selected="false" data-tab="deltas">Deltas</button>
       </div>
 
       <!-- ============ OVERVIEW MATRIX ============ -->
@@ -96,69 +96,150 @@
                 <th>Celia-Mini-C0.1</th>
                 <th>Celia-Mini-C0.2</th>
                 <th class="col-hi">Celia-Medium-C0.1</th>
+                <th>Celia-H0.1</th>
                 <th>Celia-C0.2</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="grp"><td colspan="6">Identity</td></tr>
-              <tr><th>Series</th><td>C &middot; main</td><td>Mini-C &middot; probe</td><td>Mini-C &middot; probe</td><td class="col-hi">Medium-C &middot; probe</td><td>C &middot; main</td></tr>
+              <tr class="grp"><td colspan="7">Identity</td></tr>
+              <tr><th>Series</th><td>C &middot; main</td><td>Mini-C &middot; probe</td><td>Mini-C &middot; probe</td><td class="col-hi">Medium-C &middot; probe</td><td>H &middot; hybrid lab</td><td>C &middot; main</td></tr>
               <tr><th>Status</th>
                 <td><span class="badge badge--fail">not serviceable</span></td>
                 <td><span class="badge badge--fail">not serviceable</span></td>
                 <td><span class="badge badge--done">complete</span></td>
                 <td class="col-hi"><span class="badge badge--done">complete</span></td>
+                <td><span class="badge badge--done">complete</span></td>
                 <td><span class="badge badge--planned">planned</span></td></tr>
-              <tr><th>Recipe probed</th><td class="val">&mdash;</td><td class="val">C0.1 broad</td><td class="val">C0.2: concentration + Template V1</td><td class="val col-hi">C0.2 + strict 30:1 + wide-shallow</td><td class="val">&mdash;</td></tr>
+              <tr><th>Recipe probed</th><td class="val">&mdash;</td><td class="val">C0.1 broad</td><td class="val">C0.2: concentration + Template V1</td><td class="val col-hi">C0.2 + strict 30:1 + wide-shallow</td><td class="val">attention+SSM hybrid @ 40:1</td><td class="val">&mdash;</td></tr>
 
-              <tr class="grp"><td colspan="6">Parameters &amp; architecture</td></tr>
-              <tr><th>Parameters</th><td class="val">125,077,824</td><td class="val">50,016,768</td><td class="val">50,018,304</td><td class="val col-hi">68,531,712</td><td class="tbd">TBD (250M+ candidate)</td></tr>
-              <tr><th>Hidden size</th><td class="val">576</td><td class="val">512</td><td class="val">512</td><td class="val col-hi">768</td><td class="tbd">TBD (deep-thin)</td></tr>
-              <tr><th>Layers</th><td class="val">30</td><td class="val">12</td><td class="val">12</td><td class="val col-hi">7</td><td class="tbd">TBD (deep-thin)</td></tr>
-              <tr><th>Attn heads / KV heads</th><td class="val">9 / 3</td><td class="val">8 / 2</td><td class="val">8 / 2</td><td class="val col-hi">8 / 2</td><td class="tbd">TBD</td></tr>
-              <tr><th>Head dim</th><td class="val">64</td><td class="val">64</td><td class="val">64</td><td class="val col-hi">96</td><td class="tbd">TBD</td></tr>
-              <tr><th>Intermediate (MLP)</th><td class="val">1536</td><td class="val">1376</td><td class="val">1376</td><td class="val col-hi">2048</td><td class="tbd">TBD</td></tr>
-              <tr><th>Activation</th><td class="val">SwiGLU</td><td class="val">SwiGLU</td><td class="val">SwiGLU</td><td class="val col-hi">SwiGLU</td><td class="val">SwiGLU</td></tr>
-              <tr><th>Norm</th><td class="val">RMSNorm (1e-6)</td><td class="val">RMSNorm (1e-6)</td><td class="val">RMSNorm (1e-6)</td><td class="val col-hi">RMSNorm (1e-6)</td><td class="val">RMSNorm</td></tr>
-              <tr><th>Positional</th><td class="val">RoPE &theta;=10000</td><td class="val">RoPE &theta;=10000</td><td class="val">RoPE &theta;=10000</td><td class="val col-hi">RoPE &theta;=10000</td><td class="val">RoPE</td></tr>
-              <tr><th>Vocab size</th><td class="val">32,768</td><td class="val">32,768</td><td class="val">32,771 (+3 roles)</td><td class="val col-hi">32,771 (+3 roles)</td><td class="val">32,771</td></tr>
-              <tr><th>Context length</th><td class="val">2048</td><td class="val">2048</td><td class="val">2048</td><td class="val col-hi">2048</td><td class="val">2048</td></tr>
-              <tr><th>Embeddings</th><td class="val">tied</td><td class="val">tied</td><td class="val">tied</td><td class="val col-hi">tied</td><td class="val">tied</td></tr>
+              <tr class="grp"><td colspan="7">Parameters &amp; architecture</td></tr>
+              <tr><th>Parameters</th><td class="val">125,077,824</td><td class="val">50,016,768</td><td class="val">50,018,304</td><td class="val col-hi">68,531,712</td><td class="val">25,834,080</td><td class="tbd">TBD (250M+ candidate)</td></tr>
+              <tr><th>Hidden size</th><td class="val">576</td><td class="val">512</td><td class="val">512</td><td class="val col-hi">768</td><td class="val">320</td><td class="tbd">TBD (deep-thin)</td></tr>
+              <tr><th>Layers</th><td class="val">30</td><td class="val">12</td><td class="val">12</td><td class="val col-hi">7</td><td class="val">19 (16 Mamba-2 + 3 attn)</td><td class="tbd">TBD (deep-thin)</td></tr>
+              <tr><th>Attn heads / KV heads</th><td class="val">9 / 3</td><td class="val">8 / 2</td><td class="val">8 / 2</td><td class="val col-hi">8 / 2</td><td class="val">8 / 2 (attn blocks)</td><td class="tbd">TBD</td></tr>
+              <tr><th>Head dim</th><td class="val">64</td><td class="val">64</td><td class="val">64</td><td class="val col-hi">96</td><td class="val">40</td><td class="tbd">TBD</td></tr>
+              <tr><th>Intermediate (MLP)</th><td class="val">1536</td><td class="val">1376</td><td class="val">1376</td><td class="val col-hi">2048</td><td class="val">1376 (attn blocks)</td><td class="tbd">TBD</td></tr>
+              <tr><th>Activation</th><td class="val">SwiGLU</td><td class="val">SwiGLU</td><td class="val">SwiGLU</td><td class="val col-hi">SwiGLU</td><td class="val">SwiGLU + Mamba-2 SSD</td><td class="val">SwiGLU</td></tr>
+              <tr><th>Norm</th><td class="val">RMSNorm (1e-6)</td><td class="val">RMSNorm (1e-6)</td><td class="val">RMSNorm (1e-6)</td><td class="val col-hi">RMSNorm (1e-6)</td><td class="val">RMSNorm (1e-6)</td><td class="val">RMSNorm</td></tr>
+              <tr><th>Positional</th><td class="val">RoPE &theta;=10000</td><td class="val">RoPE &theta;=10000</td><td class="val">RoPE &theta;=10000</td><td class="val col-hi">RoPE &theta;=10000</td><td class="val">RoPE (attn) / implicit (SSM)</td><td class="val">RoPE</td></tr>
+              <tr><th>Vocab size</th><td class="val">32,768</td><td class="val">32,768</td><td class="val">32,771 (+3 roles)</td><td class="val col-hi">32,771 (+3 roles)</td><td class="val">32,771 (+3 roles)</td><td class="val">32,771</td></tr>
+              <tr><th>Context length</th><td class="val">2048</td><td class="val">2048</td><td class="val">2048</td><td class="val col-hi">2048</td><td class="val">2048</td><td class="val">2048</td></tr>
+              <tr><th>Embeddings</th><td class="val">tied</td><td class="val">tied</td><td class="val">tied</td><td class="val col-hi">tied</td><td class="val">tied</td><td class="val">tied</td></tr>
 
-              <tr class="grp"><td colspan="6">Training configuration</td></tr>
-              <tr><th>Train tokens</th><td class="val">2,501,509,120</td><td class="val">1,000,275,968</td><td class="val">994,996,224</td><td class="val col-hi">2,055,864,320</td><td class="tbd">TBD (overtrained)</td></tr>
-              <tr><th>Tokens : params</th><td class="val">~20:1</td><td class="val">~20:1</td><td class="val">~20:1</td><td class="val col-hi">strict 30:1</td><td class="tbd">30:1&ndash;190:1 (WSD)</td></tr>
-              <tr><th>Batch size</th><td class="val">32</td><td class="val">64</td><td class="val">64</td><td class="val col-hi">64</td><td class="val">TBD (&micro;Transfer)</td></tr>
-              <tr><th>Peak / min LR</th><td class="val">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td><td class="val col-hi">3e-4 / 3e-5</td><td class="tbd">&micro;Transfer TBD</td></tr>
-              <tr><th>Schedule / warmup</th><td class="val">cosine / 1%</td><td class="val">cosine / 1%</td><td class="val">cosine / 1%</td><td class="val col-hi">cosine / 1%</td><td class="tbd">WSD (candidate)</td></tr>
-              <tr><th>Weight decay</th><td class="val">0.1</td><td class="val">0.1</td><td class="val">0.1</td><td class="val col-hi">0.1</td><td class="val">0.1</td></tr>
-              <tr><th>Optimizer</th><td class="val">AdamW (0.9, 0.95)</td><td class="val">AdamW (0.9, 0.95)</td><td class="val">AdamW (0.9, 0.95)</td><td class="val col-hi">AdamW (0.9, 0.95)</td><td class="val">AdamW</td></tr>
-              <tr><th>Grad clip</th><td class="val">1.0</td><td class="val">1.0</td><td class="val">1.0</td><td class="val col-hi">1.0</td><td class="val">1.0</td></tr>
-              <tr><th>Precision</th><td class="val">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td><td class="val col-hi">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td></tr>
-              <tr><th>torch.compile</th><td class="val">no (baseline)</td><td class="val">yes (1.96&times;)</td><td class="val">yes (1.96&times;)</td><td class="val col-hi">yes (1.96&times;)</td><td class="val">yes</td></tr>
-              <tr><th>Throughput</th><td class="val">~14.6k tok/s</td><td class="val">~60k tok/s</td><td class="val">~57k tok/s</td><td class="val col-hi">~56.5k tok/s</td><td class="tbd">&mdash;</td></tr>
-              <tr><th>Wall clock</th><td class="val">~24&ndash;48 h</td><td class="val">~4.6 h</td><td class="val">4.86 h</td><td class="val col-hi">10.14 h</td><td class="tbd">multi-day</td></tr>
-              <tr><th>Peak VRAM</th><td class="val">85.7 GiB</td><td class="val">~82 GiB</td><td class="val">82.3 GiB</td><td class="val col-hi">79.2 GiB</td><td class="tbd">&mdash;</td></tr>
-              <tr><th>Seed</th><td class="val">7132026</td><td class="val">7132026</td><td class="val">7132026</td><td class="val col-hi">17072026</td><td class="val">TBD</td></tr>
-              <tr><th>Hardware</th><td class="val">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td><td class="val col-hi">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td></tr>
+              <tr class="grp"><td colspan="7">Training configuration</td></tr>
+              <tr><th>Train tokens</th><td class="val">2,501,509,120</td><td class="val">1,000,275,968</td><td class="val">994,996,224</td><td class="val col-hi">2,055,864,320</td><td class="val">1,033,240,576</td><td class="tbd">TBD (overtrained)</td></tr>
+              <tr><th>Tokens : params</th><td class="val">~20:1</td><td class="val">~20:1</td><td class="val">~20:1</td><td class="val col-hi">strict 30:1</td><td class="val">40:1</td><td class="tbd">30:1&ndash;190:1 (WSD)</td></tr>
+              <tr><th>Batch size</th><td class="val">32</td><td class="val">64</td><td class="val">64</td><td class="val col-hi">64</td><td class="val">64 (16 &times; 4 accum)</td><td class="val">TBD (&micro;Transfer)</td></tr>
+              <tr><th>Peak / min LR</th><td class="val">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td><td class="val col-hi">3e-4 / 3e-5</td><td class="val">3e-4 / 3e-5</td><td class="tbd">&micro;Transfer TBD</td></tr>
+              <tr><th>Schedule / warmup</th><td class="val">cosine / 1%</td><td class="val">cosine / 1%</td><td class="val">cosine / 1%</td><td class="val col-hi">cosine / 1%</td><td class="val">cosine / 1%</td><td class="tbd">WSD (candidate)</td></tr>
+              <tr><th>Weight decay</th><td class="val">0.1</td><td class="val">0.1</td><td class="val">0.1</td><td class="val col-hi">0.1</td><td class="val">0.1</td><td class="val">0.1</td></tr>
+              <tr><th>Optimizer</th><td class="val">AdamW (0.9, 0.95)</td><td class="val">AdamW (0.9, 0.95)</td><td class="val">AdamW (0.9, 0.95)</td><td class="val col-hi">AdamW (0.9, 0.95)</td><td class="val">AdamW (0.9, 0.95)</td><td class="val">AdamW</td></tr>
+              <tr><th>Grad clip</th><td class="val">1.0</td><td class="val">1.0</td><td class="val">1.0</td><td class="val col-hi">1.0</td><td class="val">1.0</td><td class="val">1.0</td></tr>
+              <tr><th>Precision</th><td class="val">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td><td class="val col-hi">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td><td class="val">bf16 / fp32 master</td></tr>
+              <tr><th>torch.compile</th><td class="val">no (baseline)</td><td class="val">yes (1.96&times;)</td><td class="val">yes (1.96&times;)</td><td class="val col-hi">yes (1.96&times;)</td><td class="val">yes</td><td class="val">yes</td></tr>
+              <tr><th>Throughput</th><td class="val">~14.6k tok/s</td><td class="val">~60k tok/s</td><td class="val">~57k tok/s</td><td class="val col-hi">~56.5k tok/s</td><td class="val">~33k tok/s</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>Wall clock</th><td class="val">~24&ndash;48 h</td><td class="val">~4.6 h</td><td class="val">4.86 h</td><td class="val col-hi">10.14 h</td><td class="val">~8.7 h</td><td class="tbd">multi-day</td></tr>
+              <tr><th>Peak VRAM</th><td class="val">85.7 GiB</td><td class="val">~82 GiB</td><td class="val">82.3 GiB</td><td class="val col-hi">79.2 GiB</td><td class="val">28.7 GiB</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>Seed</th><td class="val">7132026</td><td class="val">7132026</td><td class="val">7132026</td><td class="val col-hi">17072026</td><td class="val">7132026</td><td class="val">TBD</td></tr>
+              <tr><th>Hardware</th><td class="val">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td><td class="val col-hi">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td><td class="val">DGX Spark (GB10)</td></tr>
 
-              <tr class="grp"><td colspan="6">Corpus</td></tr>
-              <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">~0.006%</td><td class="val">25.0%</td><td class="val col-hi">15.0%</td><td class="tbd">&ge;15% (target)</td></tr>
-              <tr><th>Christian tokens</th><td class="val">5.6M</td><td class="val">5.6M</td><td class="val">250M (240M raw + 10M chat)</td><td class="val col-hi">308M (250M raw + 58M chat)</td><td class="tbd">TBD</td></tr>
-              <tr><th>Christian epochs</th><td class="val">&lt;1</td><td class="val">&lt;1</td><td class="val">1.92 (raw)</td><td class="val col-hi">2.0 raw / 1.28 chat</td><td class="tbd">&le;2</td></tr>
-              <tr><th>Chat-format (Template V1)</th><td class="val">none</td><td class="val">none</td><td class="val">10M (1.0%)</td><td class="val col-hi">58M (2.83%)</td><td class="val">1&ndash;2% (planned)</td></tr>
-              <tr><th>General tokens</th><td class="val">~2.5B</td><td class="val">~1.0B</td><td class="val">750M (75%)</td><td class="val col-hi">1.748B (85%)</td><td class="tbd">TBD</td></tr>
-              <tr><th>Chat template</th><td class="val">none</td><td class="val">none</td><td class="val">Celia Template V1</td><td class="val col-hi">Celia Template V1</td><td class="val">Celia Template V1</td></tr>
-              <tr><th>Decoding default</th><td class="val">greedy</td><td class="val">greedy</td><td class="val">temp 0.5, top-p 0.9, rep 1.15</td><td class="val col-hi">temp 0.5, top-p 0.9, rep 1.15</td><td class="val">temp 0.5</td></tr>
+              <tr class="grp"><td colspan="7">Corpus</td></tr>
+              <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">~0.006%</td><td class="val">25.0%</td><td class="val col-hi">15.0%</td><td class="val">25.0% (Mini-C0.2 corpus)</td><td class="tbd">&ge;15% (target)</td></tr>
+              <tr><th>Christian tokens</th><td class="val">5.6M</td><td class="val">5.6M</td><td class="val">250M (240M raw + 10M chat)</td><td class="val col-hi">308M (250M raw + 58M chat)</td><td class="val">250M (Mini-C0.2 corpus)</td><td class="tbd">TBD</td></tr>
+              <tr><th>Christian epochs</th><td class="val">&lt;1</td><td class="val">&lt;1</td><td class="val">1.92 (raw)</td><td class="val col-hi">2.0 raw / 1.28 chat</td><td class="val">~1.04</td><td class="tbd">&le;2</td></tr>
+              <tr><th>Chat-format (Template V1)</th><td class="val">none</td><td class="val">none</td><td class="val">10M (1.0%)</td><td class="val col-hi">58M (2.83%)</td><td class="val">10M (1.0%)</td><td class="val">1&ndash;2% (planned)</td></tr>
+              <tr><th>General tokens</th><td class="val">~2.5B</td><td class="val">~1.0B</td><td class="val">750M (75%)</td><td class="val col-hi">1.748B (85%)</td><td class="val">750M (75%)</td><td class="tbd">TBD</td></tr>
+              <tr><th>Chat template</th><td class="val">none</td><td class="val">none</td><td class="val">Celia Template V1</td><td class="val col-hi">Celia Template V1</td><td class="val">Celia Template V1</td><td class="val">Celia Template V1</td></tr>
+              <tr><th>Decoding default</th><td class="val">greedy</td><td class="val">greedy</td><td class="val">temp 0.5, top-p 0.9, rep 1.15</td><td class="val col-hi">temp 0.5, top-p 0.9, rep 1.15</td><td class="val">greedy (base)</td><td class="val">temp 0.5</td></tr>
 
-              <tr class="grp"><td colspan="6">Results</td></tr>
-              <tr><th>Pretrain train loss (final)</th><td class="val">2.819</td><td class="val">3.586</td><td class="val">2.328</td><td class="val col-hi">1.769</td><td class="tbd">pending</td></tr>
-              <tr><th>Best eval loss</th><td class="val">2.24 (post-SFT)</td><td class="val">2.57 (post-SFT)</td><td class="val">3.252 (base)</td><td class="val col-hi">2.823 (base)</td><td class="tbd">pending</td></tr>
-              <tr><th>CSMB scripture / CAIB-MC / COGB</th><td class="val">~0 (base)</td><td class="val">~0 (base)</td><td class="val">24.0 / 0 / 0</td><td class="val col-hi">12.0 / 0 / 0</td><td class="tbd">&mdash;</td></tr>
-              <tr><th>Generation verdict</th><td class="val">degenerate (loops / multilingual)</td><td class="val">degenerate (same failure)</td><td class="val">coherent prose; scripture-fluent; no structured output</td><td class="val col-hi">coherent prose, cleaner; less scripture; no structured output</td><td class="tbd">&mdash;</td></tr>
+              <tr class="grp"><td colspan="7">Results</td></tr>
+              <tr><th>Pretrain train loss (final)</th><td class="val">2.819</td><td class="val">3.586</td><td class="val">2.328</td><td class="val col-hi">1.769</td><td class="val">3.192</td><td class="tbd">pending</td></tr>
+              <tr><th>Best eval loss</th><td class="val">2.24 (post-SFT)</td><td class="val">2.57 (post-SFT)</td><td class="val">3.252 (base)</td><td class="val col-hi">2.823 (base)</td><td class="val">3.327 (base)</td><td class="tbd">pending</td></tr>
+              <tr><th>CSMB scripture / CAIB-MC / COGB</th><td class="val">~0 (base)</td><td class="val">~0 (base)</td><td class="val">24.0 / 0 / 0</td><td class="val col-hi">12.0 / 0 / 0</td><td class="val">12.4 / 0 / 0</td><td class="tbd">&mdash;</td></tr>
+              <tr><th>Generation verdict</th><td class="val">degenerate (loops / multilingual)</td><td class="val">degenerate (same failure)</td><td class="val">coherent prose; scripture-fluent; no structured output</td><td class="val col-hi">coherent prose, cleaner; less scripture; no structured output</td><td class="val">coherent base prose; scripture-lean</td><td class="tbd">&mdash;</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="reg-foot-note">Highlighted column = Celia-Medium-C0.1-68M, the newest completed model. Loss figures are <em>not</em> directly comparable across models: C0.1 &amp; Mini-C0.1 were evaluated after a bolt-on SFT on a broad, ~0%-Christian base; Mini-C0.2 &amp; Medium-C0.1 are <em>base</em> pretrained models with Celia Template V1 woven into pretraining (no SFT). The structured tasks (CAIB multiple-choice, COGB JSON) floor at ~0 for <em>every</em> base model here &mdash; the pre-template ones couldn&rsquo;t generate coherently at all, while Mini-C0.2/Medium write fluent prose but don&rsquo;t emit the letter/JSON these tasks parse (that needs instruction/format tuning). CSMB scores scripture mechanics in prose, so it is the one automatic signal that separates them &mdash; and the 25%-Christian Mini-C0.2 (24.0) leads the 15%-Christian Medium (12.0). Right-padding in the batched harness depresses all scores slightly and equally.</p>
+        <p class="reg-foot-note">Highlighted column = Celia-Medium-C0.1-68M. The six columns are the project&rsquo;s six trained models (Celia-C0.2 shown as the planned next main-series step); the 31B fine-tune <strong>Celia-G0.1-31B</strong> is documented in its own <em>Fine-tuned models</em> tab, and all six meet on the axes that cross lineages in the <em>Benchmarks</em> tab. Loss figures are <em>not</em> directly comparable across models: C0.1 &amp; Mini-C0.1 were evaluated after a bolt-on SFT on a broad, ~0%-Christian base; Mini-C0.2, Medium-C0.1 &amp; H0.1 are <em>base</em> pretrained models with Celia Template V1 woven into pretraining (no SFT). The structured tasks (CAIB multiple-choice, COGB JSON) floor at ~0 for <em>every</em> from-scratch base model here &mdash; the pre-template ones couldn&rsquo;t generate coherently at all, while Mini-C0.2/Medium/H0.1 write fluent prose but don&rsquo;t emit the letter/JSON these tasks parse (that needs instruction/format tuning). CSMB scores scripture mechanics in prose, so it is the one automatic signal that separates them &mdash; the 25%-Christian Mini-C0.2 (24.0) leads the 15%-Christian Medium (12.0), and the half-size H0.1 hybrid (12.4) matches Medium at 38% of its parameters. Right-padding in the batched harness depresses all scores slightly and equally.</p>
+
+        <!-- deltas folded inline (no longer a separate sub-page) -->
+        <h3 class="delta-section-title" style="font-family:var(--font-display);color:var(--ink);margin:30px 0 4px;">Pairwise deltas</h3>
+        <p class="sub" style="margin:0 0 16px;">Model-to-model diffs &mdash; each isolates roughly one variable in the ablation program.</p>
+
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin:14px 0 2px;">Mini-C0.2 &rarr; Medium-C0.1-68M</h4>
+        <p class="delta-lead">The scale + overtraining step among the working (template-infused) models &mdash; both grammatically coherent, differing in size, token budget, corpus, and shape.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>Mini-C0.2</th><th>Medium-C0.1</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Parameters</th><td class="val">50,018,304</td><td class="val">68,531,712</td><td class="chg chg-up">&plus;37%</td></tr>
+            <tr><th>Shape</th><td class="val">512 &times; 12</td><td class="val">768 &times; 7</td><td class="chg">wider, shallower</td></tr>
+            <tr><th>Head dim</th><td class="val">64</td><td class="val">96</td><td class="chg">&plus;50%</td></tr>
+            <tr><th>Train tokens</th><td class="val">0.99B</td><td class="val">2.056B</td><td class="chg chg-up">&times;2.07</td></tr>
+            <tr><th>Tokens : params</th><td class="val">~20:1</td><td class="val">strict 30:1</td><td class="chg chg-key">overtrained</td></tr>
+            <tr><th>Christian share</th><td class="val">25.0%</td><td class="val">15.0%</td><td class="chg">&minus;10 pts</td></tr>
+            <tr><th>Chat-format tokens</th><td class="val">10M (1.0%)</td><td class="val">58M (2.83%)</td><td class="chg chg-up">&times;5.8</td></tr>
+            <tr><th>Throughput</th><td class="val">~57k tok/s</td><td class="val">~56.5k tok/s</td><td class="chg">~flat (wide-shallow win)</td></tr>
+            <tr><th>Wall clock</th><td class="val">4.86 h</td><td class="val">10.14 h</td><td class="chg">&times;2.1</td></tr>
+            <tr><th>Pretrain train loss</th><td class="val">2.328</td><td class="val">1.769</td><td class="chg chg-up">&minus;0.559</td></tr>
+            <tr><th>Best eval loss</th><td class="val">3.252</td><td class="val">2.823</td><td class="chg chg-up">&minus;0.429</td></tr>
+            <tr><th>CSMB scripture</th><td class="val">24.0</td><td class="val">12.0</td><td class="chg">&minus;12.0 (less concentration)</td></tr>
+          </tbody></table>
+        </div>
+
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin:14px 0 2px;">Mini-C0.2 &rarr; H0.1 <span class="badge">architecture</span></h4>
+        <p class="delta-lead">The architecture question at gauntlet scale &mdash; a 25.8M attention+SSM hybrid at 40:1 against the 50M transformer at 20:1 on the same corpus. Half the parameters, double the ratio; size won.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>Mini-C0.2</th><th>H0.1</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Parameters</th><td class="val">50,018,304</td><td class="val">25,834,080</td><td class="chg">&minus;48%</td></tr>
+            <tr><th>Architecture</th><td class="val">12&times; transformer</td><td class="val">16 Mamba-2 + 3 attn</td><td class="chg chg-key">hybrid SSM</td></tr>
+            <tr><th>Tokens : params</th><td class="val">~20:1</td><td class="val">40:1</td><td class="chg chg-up">&times;2</td></tr>
+            <tr><th>Corpus</th><td class="val">Mini-C0.2 data</td><td class="val">same files</td><td class="chg">identical</td></tr>
+            <tr><th>Best eval loss</th><td class="val">3.252</td><td class="val">3.327</td><td class="chg">&plus;0.075</td></tr>
+            <tr><th>CSMB scripture</th><td class="val">24.0</td><td class="val">12.4</td><td class="chg">&minus;11.6 (size dominates)</td></tr>
+            <tr><th>CSMB valid-ref</th><td class="val">96.7%</td><td class="val">69.2%</td><td class="chg">&minus;27.5 pts</td></tr>
+          </tbody></table>
+        </div>
+
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin:14px 0 2px;">Mini-C0.1 &rarr; Mini-C0.2</h4>
+        <p class="delta-lead">The controlled recipe experiment &mdash; identical 50M scale and ~1B token budget, changing only the recipe. This is the one that fixed coherence.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>Mini-C0.1</th><th>Mini-C0.2</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">25.0%</td><td class="chg chg-key">&plus;25 pts &middot; ~4,000&times;</td></tr>
+            <tr><th>Chat template</th><td class="val">none</td><td class="val">Template V1</td><td class="chg chg-key">introduced</td></tr>
+            <tr><th>Chat-format tokens</th><td class="val">0</td><td class="val">10M (1%)</td><td class="chg chg-up">&plus;10M</td></tr>
+            <tr><th>Vocab</th><td class="val">32,768</td><td class="val">32,771</td><td class="chg">&plus;3 role tokens</td></tr>
+            <tr><th>Decoding default</th><td class="val">greedy</td><td class="val">temp 0.5 + rep 1.15</td><td class="chg chg-key">anti-loop</td></tr>
+            <tr><th>Pretrain train loss</th><td class="val">3.586</td><td class="val">2.328</td><td class="chg chg-up">&minus;1.258</td></tr>
+            <tr><th>Generation</th><td class="val">degenerate</td><td class="val">coherent, stops cleanly</td><td class="chg chg-up">categorical fix</td></tr>
+          </tbody></table>
+        </div>
+
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin:14px 0 2px;">Celia-C0.1 &rarr; Celia-Mini-C0.1</h4>
+        <p class="delta-lead">Scale delta on the same broad recipe &mdash; how the diagnostic failure carries down from 125M to 50M.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>C0.1</th><th>Mini-C0.1</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Parameters</th><td class="val">125,077,824</td><td class="val">50,016,768</td><td class="chg">&minus;60%</td></tr>
+            <tr><th>Shape</th><td class="val">576 &times; 30</td><td class="val">512 &times; 12</td><td class="chg">narrower, shallower</td></tr>
+            <tr><th>Train tokens</th><td class="val">2.50B</td><td class="val">1.00B</td><td class="chg">&minus;60%</td></tr>
+            <tr><th>Batch</th><td class="val">32</td><td class="val">64</td><td class="chg">&times;2</td></tr>
+            <tr><th>Compile</th><td class="val">no</td><td class="val">yes (1.96&times;)</td><td class="chg chg-up">added</td></tr>
+            <tr><th>Pretrain loss</th><td class="val">2.819</td><td class="val">3.586</td><td class="chg">&plus;0.767</td></tr>
+            <tr><th>SFT CSMB scripture</th><td class="val">14.73</td><td class="val">6.13</td><td class="chg">&minus;8.60</td></tr>
+            <tr><th>Generation</th><td class="val">degenerate</td><td class="val">degenerate</td><td class="chg">same failure</td></tr>
+          </tbody></table>
+        </div>
+
+        <h4 style="font-family:var(--font-display);color:var(--ink);margin:14px 0 2px;">Medium-C0.1-68M &rarr; Celia-C0.2 <span class="badge badge--planned">projected</span></h4>
+        <p class="delta-lead">The research-optimized main-series jump the ablation program is building toward.</p>
+        <div class="tbl-scroll" style="margin-bottom:22px;">
+          <table class="reg delta"><thead><tr><th>Category</th><th>Medium-C0.1</th><th>C0.2 (planned)</th><th>Change</th></tr></thead><tbody>
+            <tr><th>Parameters</th><td class="val">68.5M</td><td class="tbd">250M+ candidate</td><td class="chg chg-up">&times;3.7+</td></tr>
+            <tr><th>Shape</th><td class="val">wide-shallow (768&times;7)</td><td class="tbd">deep-thin</td><td class="chg chg-key">axis flip (MobileLLM)</td></tr>
+            <tr><th>Schedule</th><td class="val">cosine</td><td class="tbd">WSD (candidate)</td><td class="chg chg-key">train-any-length</td></tr>
+            <tr><th>Hyperparams</th><td class="val">hand-set</td><td class="tbd">&micro;Transfer</td><td class="chg">proxy-tuned</td></tr>
+            <tr><th>Data</th><td class="val">flat mix</td><td class="tbd">annealed curriculum</td><td class="chg chg-key">high-quality last</td></tr>
+            <tr><th>Extras</th><td class="val">&mdash;</td><td class="tbd">dispersion loss, z-loss</td><td class="chg">to ablate</td></tr>
+          </tbody></table>
+        </div>
       </section>
 
       <!-- ============ MODEL CARDS ============ -->
@@ -312,13 +393,42 @@
         </div>
       </section>
 
+      <!-- ============ BENCHMARKS ============ -->
+      <section class="reg-panel" data-panel="benchmarks">
+        <p class="sub" style="margin:8px 0 14px;">The one place all six trained Celia models meet on shared axes &mdash; automatic evaluation suites run with an identical harness (batched HF generation, greedy, seed 42, right-padded). Scores below are for <em>base / adapter</em> models as noted; the from-scratch C-series are pretrained bases (no instruction tuning), so structured-output tasks floor at zero for them by design.</p>
+
+        <h3 style="font-family:var(--font-display);color:var(--ink);margin:18px 0 6px;">What each benchmark measures</h3>
+        <table class="kv"><tbody>
+          <tr><td><strong>CSMB V2</strong> (Christian Scripture Mechanics)</td><td>Scores scripture <em>mechanics in prose</em> &mdash; reference validity, quotation fidelity, anchoring. Primary number is the mechanical-scripture composite (0&ndash;100); companion is valid-reference rate. The one automatic signal that separates coherent base models. 180 rows.</td></tr>
+          <tr><td><strong>CAIB V2</strong> (Christian Applied-Issues Bench)</td><td>Multiple-choice + open applied-reasoning. MC accuracy needs the model to emit a parseable letter &mdash; a format/instruction-following capability, not just knowledge. 160 MC + 140 open. Chance = 25%.</td></tr>
+          <tr><td><strong>COGB V1</strong> (Christian Output-Governance Bench)</td><td>Five JSON-output governance tasks (issue classification, scripture-anchor selection, secular-drift detection, context fidelity, application-step selection). Weighted composite 25/25/20/15/15; requires valid structured output. 200 rows.</td></tr>
+        </tbody></table>
+
+        <h3 style="font-family:var(--font-display);color:var(--ink);margin:24px 0 6px;">Cross-model results</h3>
+        <div class="tbl-scroll">
+          <table class="reg"><thead>
+            <tr><th>Model</th><th>Params</th><th>Type</th><th>CSMB mech</th><th>CSMB valid-ref</th><th>CAIB MC</th><th>COGB comp</th><th>Train eval loss</th></tr>
+          </thead><tbody>
+            <tr><th>Celia-C0.1</th><td class="val">125M</td><td class="val">base (+SFT)</td><td class="val">~0 / 14.7*</td><td class="val">&mdash;</td><td class="val">0</td><td class="val">0</td><td class="val">2.24</td></tr>
+            <tr><th>Celia-Mini-C0.1</th><td class="val">50M</td><td class="val">base (+SFT)</td><td class="val">~0 / 6.1*</td><td class="val">&mdash;</td><td class="val">0</td><td class="val">0</td><td class="val">2.57</td></tr>
+            <tr><th>Celia-Mini-C0.2</th><td class="val">50M</td><td class="val">base</td><td class="val">24.0</td><td class="val">96.7%</td><td class="val">0</td><td class="val">0</td><td class="val">3.252</td></tr>
+            <tr><th>Celia-Medium-C0.1</th><td class="val">68M</td><td class="val">base</td><td class="val">12.0</td><td class="val">70.9%</td><td class="val">0</td><td class="val">0</td><td class="val">2.823</td></tr>
+            <tr><th>Celia-H0.1</th><td class="val">25.8M</td><td class="val">base (hybrid)</td><td class="val">12.4</td><td class="val">69.2%</td><td class="val">0</td><td class="val">0</td><td class="val">3.327</td></tr>
+            <tr class="col-hi-row"><th>Celia-G0.1-31B</th><td class="val">31B (LoRA)</td><td class="val">SFT (V3.1)</td><td class="val">84.3&dagger;</td><td class="val">99.5%&dagger;</td><td class="tbd">running</td><td class="val">0.913</td><td class="val">1.036</td></tr>
+            <tr><td colspan="8" style="height:6px;padding:0;"></td></tr>
+            <tr><th style="opacity:.75;">B0.3-31B family (ref)</th><td class="val" style="opacity:.75;">31B (LoRA)</td><td class="val" style="opacity:.75;">SFT/DPO</td><td class="val" style="opacity:.75;">92&ndash;94</td><td class="val" style="opacity:.75;">100%</td><td class="val" style="opacity:.75;">0.99&ndash;1.00</td><td class="val" style="opacity:.75;">0.91&ndash;0.95</td><td class="val" style="opacity:.75;">&mdash;</td></tr>
+          </tbody></table>
+        </div>
+        <p class="reg-foot-note">*C0.1 / Mini-C0.1 CSMB shown as base ~0 / post-SFT score &mdash; both were only ever coherent after a bolt-on SFT. &dagger;Celia-G0.1-31B CSMB is the provisional Spark no-tools partial (84.3 mechanical, 99.5% valid-ref, 96.5% JSON-valid but strict-JSON 0/125 &mdash; valid JSON followed by trailing prose, a stop-token/format signature to watch); the full CSMB&times;3 + CAIB are re-running on a rented RTX PRO 6000 and refresh here on completion. COGB composite 0.913 lands squarely in the B0.3 reference band, an early sign the Celia-SFT-V3.1 data holds at 31B. Train-eval-loss values are <em>not</em> cross-comparable: C-series are pretraining losses on differing corpora; G0.1 is an SFT holdout loss (assistant tokens only). Results filed under <code>celia_eval/&lt;date&gt;/&lt;benchmark&gt;/</code>.</p>
+      </section>
+
       <!-- ============ FINE-TUNED MODELS ============ -->
       <section class="reg-panel" data-panel="finetuned">
         <p class="sub" style="margin:8px 0 14px;">Adapter fine-tunes of open-weight base models &mdash; a separate lineage from the from-scratch C-series. Purpose: a strong Celia prototype now, while the C-series pretraining recipe matures.</p>
         <div class="cards">
 
           <article class="card">
-            <h3>Celia-G0.1-31B <span class="badge">training</span></h3>
+            <h3>Celia-G0.1-31B <span class="badge badge--done">complete</span></h3>
             <p class="sub">31B &middot; G-series (Gemma lineage) &middot; first fine-tuned Celia</p>
             <h4>Base model</h4>
             <table class="kv"><tbody>
@@ -356,7 +466,7 @@
               <tr><td>Compile</td><td>regional torch.compile per decoder layer (dynamic=False; graphs shared across the 60 identical layers)</td></tr>
               <tr><td>Activation ckpt</td><td>every 2nd layer (30/60) non-reentrant &mdash; half the recompute of blanket checkpointing, ~27 GiB more residency (memory-for-time)</td></tr>
               <tr><td>Misc</td><td>use_cache off &middot; SDPA attention &middot; CUDA expandable segments &middot; pure text decoder called directly (multimodal wrapper bypassed)</td></tr>
-              <tr><td>Measured</td><td>eager: 120 tok/s, 78.9 GiB &middot; speed kit (compile + 15/60-layer checkpointing, micro-batch 1): <strong>258 tok/s, 107 GiB &mdash; 2.15&times;</strong> &middot; run currently parked; project pivoted to the research lab</td></tr>
+              <tr><td>Measured</td><td>eager: 120 tok/s, 78.9 GiB &middot; speed kit (compile + strided checkpointing): 258 tok/s, 107 GiB (2.15&times;) &middot; final run on a rented RTX PRO 6000 (96 GB): ~845 tok/s, 92.7 GiB, 832 steps / 2 epochs in ~9 h</td></tr>
             </tbody></table>
             <h4>Data (Celia-SFT-V3.1)</h4>
             <table class="kv"><tbody>
@@ -367,7 +477,14 @@
               <tr><td>Eval bins</td><td>per-source: rewrite 245 blocks / charter 75 / OASST 32 / reader 1 + token-weighted overall</td></tr>
               <tr><td>Policy</td><td>2026-07-17_v2: LLM-authored rows only, zero script-generated</td></tr>
             </tbody></table>
-            <p class="note">Launch findings: Gemma 4 requires final-logit softcapping (30.0); its multimodal wrapper demands mm_token_type_ids in training (bypassed via the text decoder); labels must be causally shifted against packed blocks. First eager run measured 120 tok/s (&asymp;29 TFLOP/s vs the GB10&rsquo;s 94 TFLOP/s measured bf16 matmul rate) &mdash; restarted with the compile + strided-checkpoint kit above.</p>
+            <h4>Results</h4>
+            <table class="kv"><tbody>
+              <tr><td>Training</td><td>overall eval loss 1.46 &rarr; <strong>1.0357</strong> (best = final adapter-step832, no early stop) &middot; per-domain: sft 0.86 / christian_qa 1.05 / oasst 1.31 / scripture_application 1.28</td></tr>
+              <tr><td>Benchmarks</td><td>COGB composite <strong>0.913</strong> (JSON-valid 96.5%; scripture-anchor 0.98, drift 0.95, context 0.97) &middot; CSMB no-tools 84.3 mechanical / 99.5% valid-ref (provisional) &middot; CAIB re-running &mdash; see the Benchmarks tab</td></tr>
+              <tr><td>Comparison</td><td>COGB sits in the B0.3-31B reference band (0.91&ndash;0.95); first evidence the Celia-SFT-V3.1 packet holds at 31B scale</td></tr>
+              <tr><td>Watch</td><td>strict-JSON 0/125 on CSMB &mdash; emits valid JSON then continues with prose (a stop-token / format-discipline signature, not a knowledge gap)</td></tr>
+            </tbody></table>
+            <p class="note">Launch findings: Gemma 4 requires final-logit softcapping (30.0); its multimodal wrapper demands mm_token_type_ids in training (bypassed via the text decoder); labels must be causally shifted against packed blocks. The run completed on a rented RTX PRO 6000 (RunPod) after a Spark bring-up; the best adapter is archived and re-evaluated on demand from the same persistent volume. Operational rule learned: a stopped RunPod pod releases its GPU and often cannot restart &mdash; fetch checkpoints before stopping.</p>
           </article>
 
         </div>
@@ -463,70 +580,6 @@
         </div>
       </section>
 
-      <!-- ============ DELTAS ============ -->
-      <section class="reg-panel" data-panel="deltas">
-
-        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Mini-C0.2 &rarr; Medium-C0.1-68M</h3>
-        <p class="delta-lead">The scale + overtraining step among the working (template-infused) models &mdash; both grammatically coherent, differing in size, token budget, corpus, and shape.</p>
-        <div class="tbl-scroll" style="margin-bottom:22px;">
-          <table class="reg delta"><thead><tr><th>Category</th><th>Mini-C0.2</th><th>Medium-C0.1</th><th>Change</th></tr></thead><tbody>
-            <tr><th>Parameters</th><td class="val">50,018,304</td><td class="val">68,531,712</td><td class="chg chg-up">&plus;37%</td></tr>
-            <tr><th>Shape</th><td class="val">512 &times; 12</td><td class="val">768 &times; 7</td><td class="chg">wider, shallower</td></tr>
-            <tr><th>Head dim</th><td class="val">64</td><td class="val">96</td><td class="chg">&plus;50%</td></tr>
-            <tr><th>Train tokens</th><td class="val">0.99B</td><td class="val">2.056B</td><td class="chg chg-up">&times;2.07</td></tr>
-            <tr><th>Tokens : params</th><td class="val">~20:1</td><td class="val">strict 30:1</td><td class="chg chg-key">overtrained</td></tr>
-            <tr><th>Christian share</th><td class="val">25.0%</td><td class="val">15.0%</td><td class="chg">&minus;10 pts</td></tr>
-            <tr><th>Chat-format tokens</th><td class="val">10M (1.0%)</td><td class="val">58M (2.83%)</td><td class="chg chg-up">&times;5.8</td></tr>
-            <tr><th>Throughput</th><td class="val">~57k tok/s</td><td class="val">~56.5k tok/s</td><td class="chg">~flat (wide-shallow win)</td></tr>
-            <tr><th>Wall clock</th><td class="val">4.86 h</td><td class="val">10.14 h</td><td class="chg">&times;2.1</td></tr>
-            <tr><th>Pretrain train loss</th><td class="val">2.328</td><td class="val">1.769</td><td class="chg chg-up">&minus;0.559</td></tr>
-            <tr><th>Best eval loss</th><td class="val">3.252</td><td class="val">2.823</td><td class="chg chg-up">&minus;0.429</td></tr>
-            <tr><th>CSMB scripture</th><td class="val">24.0</td><td class="val">12.0</td><td class="chg">&minus;12.0 (less concentration)</td></tr>
-          </tbody></table>
-        </div>
-
-        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Mini-C0.1 &rarr; Mini-C0.2</h3>
-        <p class="delta-lead">The controlled recipe experiment &mdash; identical 50M scale and ~1B token budget, changing only the recipe. This is the one that fixed coherence.</p>
-        <div class="tbl-scroll" style="margin-bottom:22px;">
-          <table class="reg delta"><thead><tr><th>Category</th><th>Mini-C0.1</th><th>Mini-C0.2</th><th>Change</th></tr></thead><tbody>
-            <tr><th>Christian share</th><td class="val">~0.006%</td><td class="val">25.0%</td><td class="chg chg-key">&plus;25 pts &middot; ~4,000&times;</td></tr>
-            <tr><th>Chat template</th><td class="val">none</td><td class="val">Template V1</td><td class="chg chg-key">introduced</td></tr>
-            <tr><th>Chat-format tokens</th><td class="val">0</td><td class="val">10M (1%)</td><td class="chg chg-up">&plus;10M</td></tr>
-            <tr><th>Vocab</th><td class="val">32,768</td><td class="val">32,771</td><td class="chg">&plus;3 role tokens</td></tr>
-            <tr><th>Decoding default</th><td class="val">greedy</td><td class="val">temp 0.5 + rep 1.15</td><td class="chg chg-key">anti-loop</td></tr>
-            <tr><th>Pretrain train loss</th><td class="val">3.586</td><td class="val">2.328</td><td class="chg chg-up">&minus;1.258</td></tr>
-            <tr><th>Generation</th><td class="val">degenerate</td><td class="val">coherent, stops cleanly</td><td class="chg chg-up">categorical fix</td></tr>
-          </tbody></table>
-        </div>
-
-        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Celia-C0.1 &rarr; Celia-Mini-C0.1</h3>
-        <p class="delta-lead">Scale delta on the same broad recipe &mdash; how the diagnostic failure carries down from 125M to 50M.</p>
-        <div class="tbl-scroll" style="margin-bottom:22px;">
-          <table class="reg delta"><thead><tr><th>Category</th><th>C0.1</th><th>Mini-C0.1</th><th>Change</th></tr></thead><tbody>
-            <tr><th>Parameters</th><td class="val">125,077,824</td><td class="val">50,016,768</td><td class="chg">&minus;60%</td></tr>
-            <tr><th>Shape</th><td class="val">576 &times; 30</td><td class="val">512 &times; 12</td><td class="chg">narrower, shallower</td></tr>
-            <tr><th>Train tokens</th><td class="val">2.50B</td><td class="val">1.00B</td><td class="chg">&minus;60%</td></tr>
-            <tr><th>Batch</th><td class="val">32</td><td class="val">64</td><td class="chg">&times;2</td></tr>
-            <tr><th>Compile</th><td class="val">no</td><td class="val">yes (1.96&times;)</td><td class="chg chg-up">added</td></tr>
-            <tr><th>Pretrain loss</th><td class="val">2.819</td><td class="val">3.586</td><td class="chg">&plus;0.767</td></tr>
-            <tr><th>SFT CSMB scripture</th><td class="val">14.73</td><td class="val">6.13</td><td class="chg">&minus;8.60</td></tr>
-            <tr><th>Generation</th><td class="val">degenerate</td><td class="val">degenerate</td><td class="chg">same failure</td></tr>
-          </tbody></table>
-        </div>
-
-        <h3 style="font-family:var(--font-display);color:var(--ink);margin:6px 0 2px;">Medium-C0.1-68M &rarr; Celia-C0.2 <span class="badge badge--planned">projected</span></h3>
-        <p class="delta-lead">The research-optimized main-series jump the ablation program is building toward.</p>
-        <div class="tbl-scroll">
-          <table class="reg delta"><thead><tr><th>Category</th><th>Medium-C0.1</th><th>C0.2 (planned)</th><th>Change</th></tr></thead><tbody>
-            <tr><th>Parameters</th><td class="val">68.5M</td><td class="tbd">250M+ candidate</td><td class="chg chg-up">&times;3.7+</td></tr>
-            <tr><th>Shape</th><td class="val">wide-shallow (768&times;7)</td><td class="tbd">deep-thin</td><td class="chg chg-key">axis flip (MobileLLM)</td></tr>
-            <tr><th>Schedule</th><td class="val">cosine</td><td class="tbd">WSD (candidate)</td><td class="chg chg-key">train-any-length</td></tr>
-            <tr><th>Hyperparams</th><td class="val">hand-set</td><td class="tbd">&micro;Transfer</td><td class="chg">proxy-tuned</td></tr>
-            <tr><th>Data</th><td class="val">flat mix</td><td class="tbd">annealed curriculum</td><td class="chg chg-key">high-quality last</td></tr>
-            <tr><th>Extras</th><td class="val">&mdash;</td><td class="tbd">dispersion loss, z-loss</td><td class="chg">to ablate</td></tr>
-          </tbody></table>
-        </div>
-      </section>
 
       <p class="reg-foot-note">Sources: run configs (<code>run_config.json</code>), materialization manifests, and gauntlet summaries (CSMB / CAIB / COGB). Loss values are not comparable across differing corpora or between base and post-SFT evaluation. This registry is a research artifact and updates as models complete &mdash; base gauntlet scores for the C0.2-family fill in when the current run finishes.</p>
     </main>
