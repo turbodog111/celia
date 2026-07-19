@@ -74,7 +74,7 @@
           <span><span class="badge badge--planned">planned</span> projected specs, in design</span>
           <span><span class="badge badge--fail">not serviceable</span> completed but degenerate (diagnostic)</span>
         </div>
-        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-18 &middot; new: ratio study 0.5M leg complete &mdash; worth-it optimum ~3,000&ndash;5,000 tok/param (&lambda;=1% best: 3,981:1 @ loss 3.3788); Architecture Lab round 1 complete (hybrid attention+SSM wins: eval 5.5343 vs transformer 5.7311 at ~50M) &middot; Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
+        <p class="reg-foot-note" style="margin-top:8px;">Last updated 2026-07-19 &middot; new: ratio study 1M leg complete &mdash; the worth-it knee moved DOWN ~4&times; with 2&times; params (3,981:1 &rarr; ~1,039:1; exponent 0.245 &rarr; 0.662), so bigger models want fewer tokens per parameter &middot; Celia-H0.1 (25.8M attention+SSM hybrid, 40:1) trained overnight, gauntlet pending &middot; previously: ratio study 0.5M leg complete &mdash; worth-it optimum ~3,000&ndash;5,000 tok/param (&lambda;=1% best: 3,981:1 @ loss 3.3788); Architecture Lab round 1 complete (hybrid attention+SSM wins: eval 5.5343 vs transformer 5.7311 at ~50M) &middot; Fine-tuned models section (Celia-G0.1-31B spec) &middot; Medium-C0.1-68M complete (10.14 h) &middot; base gauntlet done. Both C0.2-family models produce coherent Christian prose but score ~0 on the structured tasks (multiple-choice, JSON) they were never trained to emit; CSMB scripture-mechanics &mdash; the one automatic prose signal &mdash; favors the higher-concentration Mini-C0.2 (24.0) over Medium (12.0).</p>
       </section>
 
       <div class="reg-tabs" role="tablist">
@@ -440,6 +440,24 @@
               <tr><td>Reference</td><td class="val">Chinchilla 20:1 scores W 0.4103 &mdash; the compute-optimal point leaves ~2.6 loss on the table for a served model</td></tr>
             </tbody></table>
             <p class="note">Verdict: the worth-it optimum is a broad plateau at <strong>~3,000&ndash;5,000 tokens per parameter</strong> (top 10 pairs all within 0.001 W). Next: the 1M leg re-runs the same protocol to test whether the &lambda;=1% knee drifts with model size; 10 branch checkpoints (flat-LR) are banked for cool-down finishing runs. Curve cross-validated across frameworks: MLX and torch agree to 0.015 loss at r=20.</p>
+          </article>
+
+          <article class="card">
+            <h3>Token-to-parameter ratio study &mdash; 1M leg <span class="badge badge--done">complete</span></h3>
+            <p class="sub">Same protocol, 2&times; the parameters &mdash; does the worth-it knee move? &middot; 2026-07-18</p>
+            <h4>Design</h4>
+            <table class="kv"><tbody>
+              <tr><td>Model</td><td>d=160 &middot; 4 layers &middot; 4 heads &middot; inter 430 &middot; same recipe as the 0.5M leg &middot; 1,236,640 non-embedding params</td></tr>
+              <tr><td>Budget rule</td><td>each leg trains up to the <em>previous</em> leg&rsquo;s &lambda;=1% optimum &mdash; so this leg was capped at 3,981:1 (&asymp;4.9B tokens). All-torch on the Spark (~250K tok/s), no MLX calibration offset needed (cross-checked at r=20 on the 0.5M leg).</td></tr>
+            </tbody></table>
+            <h4>Results</h4>
+            <table class="kv"><tbody>
+              <tr><td>Curve fit</td><td class="val">L(r) = 3.075 + 12.93&middot;r<sup>&minus;0.662</sup> (short-tail caveat: fitted on r &le; 3,981)</td></tr>
+              <tr><td>Endpoint</td><td class="val">eval 3.1245 @ r=3,981 &mdash; vs the 0.5M model&rsquo;s 3.3788 at the same ratio</td></tr>
+              <tr><td>&lambda; = 1% optimum</td><td class="val"><strong>best r &asymp; 1,039:1 &middot; loss 3.2022</strong> &middot; plateau ~1,000&ndash;1,525</td></tr>
+              <tr><td>Overrun bonus</td><td class="val">run accidentally continued to r=5,412 before halt &mdash; the extra points (e.g. 3.1106 @ 5,208) stayed on-curve, flat past the knee; logged as bonus data</td></tr>
+            </tbody></table>
+            <p class="note"><strong>Key finding: the worth-it knee moved DOWN ~4&times; when parameters doubled</strong> &mdash; 3,981:1 (0.5M) &rarr; ~1,039:1 (1M) &mdash; and the decay exponent steepened (0.245 &rarr; 0.662): bigger models extract each token&rsquo;s value in fewer passes, so extreme overtraining pays off less the larger the model. If the trend holds, production-size models want far fewer tokens per parameter than tiny probes suggest. Next: the 2M leg (capped at 1,039:1 by the budget rule) to get a third point on the knee-vs-size curve; and Celia-H0.1 (25.8M hybrid @ 40:1) applies the climb-the-ratio program to a real gauntleted model.</p>
           </article>
 
         </div>
